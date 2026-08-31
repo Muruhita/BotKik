@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
-const DISCORD_CLIENT_ID = '1335943366221762561'; // ← ЗАМЕНИ НА СВОЙ!
-const DISCORD_REDIRECT_URI = 'https://majestic-fib-forms-beta.vercel.app/api/auth';
+const DISCORD_CLIENT_ID = '1018113109346504744'; // ← ЗАМЕНИ НА СВОЙ!
+const DISCORD_REDIRECT_URI = 'https://bot-kik.vercel.app/api/auth';
 
 export default function Home() {
   const router = useRouter();
