@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
-const DISCORD_CLIENT_ID = '1018113109346504744'; // ← ЗАМЕНИ НА СВОЙ!
+const DISCORD_CLIENT_ID = '1543995099292106772';
 const DISCORD_REDIRECT_URI = 'https://bot-kik.vercel.app/api/auth';
 
 export default function Home() {
