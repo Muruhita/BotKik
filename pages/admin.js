@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
+// Список ID администраторов (добавь сюда второй ID)
+const ADMIN_IDS = [
+  '1018113109346504744', // Твой ID
+  '555380718566506506'   // ID второго админа (замени на реальный)
+];
+
 export default function AdminPanel() {
   const router = useRouter();
   const [userId, setUserId] = useState('');
@@ -12,8 +18,8 @@ export default function AdminPanel() {
     fetch('/api/me')
       .then(res => res.json())
       .then(data => {
-        // Проверяем, что это админ (твой ID)
-        if (!data.user || data.user.id !== '1018113109346504744') {
+        // Проверяем, что это админ из списка
+        if (!data.user || !ADMIN_IDS.includes(data.user.id)) {
           router.push('/'); // Если не админ, отправляем на главную
           return;
         }
