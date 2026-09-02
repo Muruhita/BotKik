@@ -6,10 +6,10 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Проверяем авторизацию и права администратора (твой ID)
   const token = req.cookies.token;
   const user = verifyToken(token);
-  
+
+  // Твой Discord ID
   if (!user || user.id !== '1018113109346504744') {
     return res.status(403).json({ error: 'Нет доступа' });
   }
@@ -20,9 +20,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Удаляем из черного списка Redis
     await removeBlacklist(userId);
-    // Сбрасываем счетчик заявок
     await clearSpamLog(userId);
     return res.status(200).json({ message: `✅ Пользователь ${userId} успешно разблокирован.` });
   } catch (error) {
