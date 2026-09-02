@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 const ADMIN_IDS = [
   '1018113109346504744', // Твой ID
   '555380718566506506',
-  '260076815970729985'// ID второго админа (замени на реальный)
+  '260076815970729985' // ID второго админа (замени на реальный)
 ];
 
 export default function AdminPanel() {
