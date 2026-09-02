@@ -113,15 +113,10 @@ async function sendToDiscord(webhookUrl, data, retries = 3) {
         body: JSON.stringify(data)
       });
       
-      console.log(`📊 Код ответа Discord [попытка ${i + 1}]: ${response.status}`);
-      
-      if (response.ok) {
-        return { success: true, status: response.status };
-      }
+      if (response.ok) return { success: true, status: response.status };
       
       if (response.status === 429) {
         const retryAfter = parseInt(response.headers.get('Retry-After')) || 5;
-        console.warn(`⚠️ Discord вернул 429. Ждём ${retryAfter} секунд...`);
         await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
         continue;
       }
@@ -130,10 +125,8 @@ async function sendToDiscord(webhookUrl, data, retries = 3) {
       return { success: false, status: response.status, error: errorText || `HTTP ${response.status}` };
     } catch (error) {
       lastError = error;
-      console.error(`❌ Попытка ${i + 1}/${retries} не удалась:`, error.message);
       if (i < retries - 1) {
-        const waitTime = 1000 * (i + 1);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
       }
     }
   }
@@ -153,7 +146,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  // Проверяем бан через Redis (async)
+  // 1. Проверяем бан через Redis
   const banned = await isBlacklisted(user.id);
   if (banned) {
     return res.status(403).json({ 
@@ -161,7 +154,7 @@ export default async function handler(req, res) {
     });
   }
 
-  // Проверяем спам через Redis (async)
+  // 2. Проверяем антиспам (3 заявки за час)
   const spamCheck = await checkSpam(user.id, user.username);
   if (spamCheck.isSpam) {
     return res.status(429).json({ error: spamCheck.message });
@@ -173,6 +166,7 @@ export default async function handler(req, res) {
 
   const allText = Object.values(formData).filter(val => typeof val === 'string').join(' ');
   
+  // 3. Проверяем на банворды
   if (containsBadWords(allText)) {
     const foundWords = findAllBadWords(allText);
     const foundWord = findBadWord(allText);
