@@ -8,10 +8,6 @@ export default function App({ Component, pageProps }) {
         <meta name="description" content="Система подачи заявок FIB" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
-        {/* Альтернатива: если используете PNG */}
-        {/* <link rel="icon" type="image/png" href="/favicon.png" /> */}
-        {/* Альтернатива: если используете SVG с эмодзи */}
-        {/* <link rel="icon" type="image/svg+xml" href="/favicon.svg" /> */}
       </Head>
       <style jsx global>{`
         * {
