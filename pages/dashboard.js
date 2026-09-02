@@ -63,8 +63,8 @@ export default function Dashboard() {
 
         <div className="card" onClick={() => router.push('/forms/report')}>
           <div className="card-icon">📋</div>
-          <h3>Отчёт о повышении</h3>
-          <p>Подать отчёт о повышении для своего отдела</p>
+          <h3>Отчёт на повышении</h3>
+          <p>Подать отчёт на повышение в свой отдел</p>
         </div>
 
         <div className="card" onClick={() => router.push('/forms/high-rank-report')}>
