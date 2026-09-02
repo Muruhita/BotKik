@@ -6,25 +6,28 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Проверяем авторизацию и что это ТЫ (твой ID)
   const token = req.cookies.token;
   const user = verifyToken(token);
-
-  // Твой Discord ID
+  
   if (!user || user.id !== '1018113109346504744') {
-    return res.status(403).json({ error: 'Нет доступа' });
+    return res.status(403).json({ error: 'Нет доступа. Вы не являетесь администратором.' });
   }
 
   const { userId } = req.body;
   if (!userId) {
-    return res.status(400).json({ error: 'Не указан ID пользователя' });
+    return res.status(400).json({ error: 'Не указан ID пользователя для разбана' });
   }
 
   try {
+    // Удаляем из черного списка Redis
     await removeBlacklist(userId);
+    // Сбрасываем счетчик заявок (чтобы мог снова подать 3 заявки)
     await clearSpamLog(userId);
+    
     return res.status(200).json({ message: `✅ Пользователь ${userId} успешно разблокирован.` });
   } catch (error) {
     console.error('Ошибка разблокировки:', error);
-    return res.status(500).json({ error: 'Ошибка разблокировки' });
+    return res.status(500).json({ error: 'Ошибка при разблокировке' });
   }
 }
