@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
+// Список ID администраторов (добавь сюда второй ID)
+const ADMIN_IDS = [
+  '1018113109346504744', // Твой ID
+  '555380718566506506'   // ID второго админа (замени на реальный)
+];
+
 export default function Dashboard() {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -33,7 +39,8 @@ export default function Dashboard() {
     );
   }
 
-  const isAdmin = user && user.id === '1018113109346504744';
+  // Проверяем, является ли пользователь админом из списка
+  const isAdmin = user && ADMIN_IDS.includes(user.id);
 
   return (
     <div className="dashboard">
@@ -47,7 +54,7 @@ export default function Dashboard() {
           />
           <span>{user.username}</span>
           
-          {/* Кнопка админ-панели (видна только тебе) */}
+          {/* Кнопка админ-панели (видна только админам из списка) */}
           {isAdmin && (
             <button onClick={() => router.push('/admin')} className="admin-btn">
               🛠️ Админ-панель
