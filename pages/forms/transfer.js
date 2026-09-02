@@ -2,16 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 const DEPARTMENTS = [
-  { id: 'cid', name: 'CID (Criminal Investigation Department)', emoji: '🚔' },
-  { id: 'fa', name: 'FA (Free Agent)', emoji: '🆓' },
-  { id: 'hrt', name: 'HRT (Hostage Rescue Team)', emoji: '🛡️' },
   { id: 'atf', name: 'ATF (Anti Terrorism Force)', emoji: '💥' },
-  { id: 'af', name: 'AF (Air Force)', emoji: '✈️' },
-  { id: 'ocu', name: 'OCU (Organized Crime Unit)', emoji: '⚖️' },
-  { id: 'dea', name: 'DEA (Drug Enforcement Administration)', emoji: '💊' },
-  { id: 'fna', name: 'FNA (Federal National Academy)', emoji: '📚' },
-  { id: 'nsb', name: 'NSB (National Security Branch)', emoji: '🏛️' },
-  { id: 'trainee', name: 'Trainee (Стажёр)', emoji: '📖' }
 ];
 
 const RANKS = [
