@@ -160,7 +160,14 @@ export default async function handler(req, res) {
   }
 
   const spamCheck = checkSpam(user.id, user.username);
-  if (spamCheck.isSpam) {
+  
+  // Если пользователь забанен за спам
+  if (spamCheck.isBanned) {
+    return res.status(429).json({ error: spamCheck.message });
+  }
+  
+  // Если есть сообщение о кулдауне
+  if (spamCheck.message && !spamCheck.isSpam) {
     return res.status(429).json({ error: spamCheck.message });
   }
 
