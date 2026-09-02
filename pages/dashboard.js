@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
-const ADMIN_USER_ID = process.env.NEXT_PUBLIC_ADMIN_ID || 'ВАШ_DISCORD_ID_ЗДЕСЬ';
+const ADMIN_USER_ID = process.env.NEXT_PUBLIC_ADMIN_ID || '1018113109346504744';
 
 export default function Dashboard() {
   const router = useRouter();
