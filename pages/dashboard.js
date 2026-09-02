@@ -1,15 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
-const ADMIN_USER_ID = '1018113109346504744'; // Ваш Discord ID
-
 export default function Dashboard() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [adminMode, setAdminMode] = useState(false);
-  const [unbanUserId, setUnbanUserId] = useState('');
-  const [unbanMessage, setUnbanMessage] = useState('');
 
   useEffect(() => {
     fetch('/api/me')
@@ -20,9 +15,6 @@ export default function Dashboard() {
           return;
         }
         setUser(data.user);
-        if (data.user.id === ADMIN_USER_ID) {
-          setAdminMode(true);
-        }
         setLoading(false);
       });
   }, []);
@@ -30,31 +22,6 @@ export default function Dashboard() {
   const handleLogout = async () => {
     await fetch('/api/logout', { method: 'POST' });
     router.push('/');
-  };
-
-  const handleUnban = async () => {
-    if (!unbanUserId.trim()) {
-      setUnbanMessage('Введите Discord ID пользователя');
-      return;
-    }
-    
-    try {
-      const res = await fetch('/api/unban', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: unbanUserId })
-      });
-      
-      const data = await res.json();
-      if (res.ok) {
-        setUnbanMessage(`✅ Пользователь ${unbanUserId} разблокирован`);
-        setUnbanUserId('');
-      } else {
-        setUnbanMessage(`❌ ${data.error || 'Ошибка'}`);
-      }
-    } catch (error) {
-      setUnbanMessage('❌ Ошибка при разблокировке');
-    }
   };
 
   if (loading) {
@@ -65,6 +32,8 @@ export default function Dashboard() {
       </div>
     );
   }
+
+  const isAdmin = user && user.id === '1018113109346504744';
 
   return (
     <div className="dashboard">
@@ -77,6 +46,14 @@ export default function Dashboard() {
             className="avatar"
           />
           <span>{user.username}</span>
+          
+          {/* Кнопка админ-панели (видна только тебе) */}
+          {isAdmin && (
+            <button onClick={() => router.push('/admin')} className="admin-btn">
+              🛠️ Админ-панель
+            </button>
+          )}
+
           <button onClick={handleLogout} className="logout-btn">Выйти</button>
         </div>
       </div>
@@ -112,22 +89,6 @@ export default function Dashboard() {
           <p>Подать заявление на увольнение из FIB</p>
         </div>
       </div>
-
-      {adminMode && (
-        <div className="admin-panel">
-          <h2>🛠️ Панель администратора</h2>
-          <div className="unban-form">
-            <input
-              type="text"
-              placeholder="Discord ID пользователя"
-              value={unbanUserId}
-              onChange={(e) => setUnbanUserId(e.target.value)}
-            />
-            <button onClick={handleUnban}>Разблокировать</button>
-          </div>
-          {unbanMessage && <p className="unban-message">{unbanMessage}</p>}
-        </div>
-      )}
 
       <style jsx>{`
         .dashboard {
@@ -173,6 +134,19 @@ export default function Dashboard() {
         }
         .logout-btn:hover {
           background: rgba(255, 255, 255, 0.15);
+        }
+        .admin-btn {
+          background: rgba(88, 101, 242, 0.3);
+          color: white;
+          border: 1px solid #5865F2;
+          padding: 8px 16px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 500;
+          transition: all 0.2s;
+        }
+        .admin-btn:hover {
+          background: rgba(88, 101, 242, 0.6);
         }
         .cards-grid {
           display: grid;
@@ -233,47 +207,6 @@ export default function Dashboard() {
         }
         .loading-container p {
           color: #8b8ba7;
-        }
-        .admin-panel {
-          max-width: 600px;
-          margin: 40px auto;
-          padding: 20px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 16px;
-        }
-        .admin-panel h2 {
-          color: #FFD700;
-          margin-bottom: 20px;
-        }
-        .unban-form {
-          display: flex;
-          gap: 10px;
-          margin-bottom: 15px;
-        }
-        .unban-form input {
-          flex: 1;
-          padding: 10px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          border-radius: 8px;
-          color: white;
-        }
-        .unban-form button {
-          padding: 10px 20px;
-          background: #4CAF50;
-          border: none;
-          border-radius: 8px;
-          color: white;
-          font-weight: 600;
-          cursor: pointer;
-        }
-        .unban-form button:hover {
-          background: #45a049;
-        }
-        .unban-message {
-          color: #8b8ba7;
-          margin-top: 10px;
         }
       `}</style>
     </div>
