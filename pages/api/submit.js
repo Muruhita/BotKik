@@ -1,86 +1,20 @@
 import { verifyToken } from '../../lib/discord';
-import { isBlacklisted, addToBlacklist } from '../../lib/blacklist';
+import { isBlacklisted, addToBlacklist, removeBlacklist } from '../../lib/antispam';
 import { containsBadWords, findBadWord, findAllBadWords } from '../../lib/badwords';
-import { checkSpam } from '../../lib/antispam';
+import { checkSpam, clearSpamLog } from '../../lib/antispam';
 
 const DEPARTMENTS = {
-  'ib': {
-    name: 'IB (Intelligence Branch)',
-    webhook: process.env.WEBHOOK_REPORT_IB,
-    emoji: '🕵️',
-    roleId: '1398200840900055071',
-    roleId2: '1520504887497064639'
-  },
-  'cid': {
-    name: 'CID (Criminal Investigation Department)',
-    webhook: process.env.WEBHOOK_REPORT_CID,
-    emoji: '🔍',
-    roleId: '1398200760843374652',
-    roleId2: '1520680049655676948'
-  },
-  'fa': {
-    name: 'FA (Free Agent)',
-    webhook: process.env.WEBHOOK_REPORT_FA,
-    emoji: '🆓',
-    roleId: '1398200891353468928',
-    roleId2: '1520680052176715876'
-  },
-  'hrt': {
-    name: 'HRT (Hostage Rescue Team)',
-    webhook: process.env.WEBHOOK_REPORT_HRT,
-    emoji: '🛡️',
-    roleId: '1398201557635567636',
-    roleId2: '1520680047038435358'
-  },
-  'atf': {
-    name: 'ATF (Anti Terrorism Force)',
-    webhook: process.env.WEBHOOK_REPORT_ATF,
-    emoji: '💥',
-    roleId: '1520680054731051159',
-    roleId2: '1398201048598057041'
-  },
-  'af': {
-    name: 'AF (Air Force)',
-    webhook: process.env.WEBHOOK_REPORT_AF,
-    emoji: '✈️',
-    roleId: '1398200952602755103',
-    roleId2: '1532529633088635041'
-  },
-  'ocu': {
-    name: 'OCU (Organized Crime Unit)',
-    webhook: process.env.WEBHOOK_REPORT_OCU,
-    emoji: '⚖️',
-    roleId: '1520680060808331294',
-    roleId2: '1418771091291115631'
-  },
-  'dea': {
-    name: 'DEA (Drug Enforcement Administration)',
-    webhook: process.env.WEBHOOK_REPORT_DEA,
-    emoji: '💊',
-    roleId: '1398201115379761283',
-    roleId2: '1274110499356934209'
-  },
-  'fna': {
-    name: 'FNA (Federal National Academy)',
-    webhook: process.env.WEBHOOK_REPORT_FNA,
-    emoji: '📚',
-    roleId: '1520680066445742232',
-    roleId2: '1385530645186613311'
-  },
-  'nsb': {
-    name: 'NSB (National Security Branch)',
-    webhook: process.env.WEBHOOK_REPORT_NSB,
-    emoji: '🏛️',
-    roleId: '1520680069415174275',
-    roleId2: '1398201167154122752'
-  },
-  'trainee': {
-    name: 'Trainee (Стажёр)',
-    webhook: process.env.WEBHOOK_REPORT_TRAINEE,
-    emoji: '📖',
-    roleId: '1385530645186613311',
-    roleId2: '1520680066445742232'
-  }
+  'ib': { name: 'IB (Intelligence Branch)', webhook: process.env.WEBHOOK_REPORT_IB, emoji: '🕵️', roleId: '1398200840900055071', roleId2: '1520504887497064639' },
+  'cid': { name: 'CID (Criminal Investigation Department)', webhook: process.env.WEBHOOK_REPORT_CID, emoji: '🔍', roleId: '1398200760843374652', roleId2: '1520680049655676948' },
+  'fa': { name: 'FA (Free Agent)', webhook: process.env.WEBHOOK_REPORT_FA, emoji: '🆓', roleId: '1398200891353468928', roleId2: '1520680052176715876' },
+  'hrt': { name: 'HRT (Hostage Rescue Team)', webhook: process.env.WEBHOOK_REPORT_HRT, emoji: '🛡️', roleId: '1398201557635567636', roleId2: '1520680047038435358' },
+  'atf': { name: 'ATF (Anti Terrorism Force)', webhook: process.env.WEBHOOK_REPORT_ATF, emoji: '💥', roleId: '1520680054731051159', roleId2: '1398201048598057041' },
+  'af': { name: 'AF (Air Force)', webhook: process.env.WEBHOOK_REPORT_AF, emoji: '✈️', roleId: '1398200952602755103', roleId2: '1532529633088635041' },
+  'ocu': { name: 'OCU (Organized Crime Unit)', webhook: process.env.WEBHOOK_REPORT_OCU, emoji: '⚖️', roleId: '1520680060808331294', roleId2: '1418771091291115631' },
+  'dea': { name: 'DEA (Drug Enforcement Administration)', webhook: process.env.WEBHOOK_REPORT_DEA, emoji: '💊', roleId: '1398201115379761283', roleId2: '1274110499356934209' },
+  'fna': { name: 'FNA (Federal National Academy)', webhook: process.env.WEBHOOK_REPORT_FNA, emoji: '📚', roleId: '1520680066445742232', roleId2: '1385530645186613311' },
+  'nsb': { name: 'NSB (National Security Branch)', webhook: process.env.WEBHOOK_REPORT_NSB, emoji: '🏛️', roleId: '1520680069415174275', roleId2: '1398201167154122752' },
+  'trainee': { name: 'Trainee (Стажёр)', webhook: process.env.WEBHOOK_REPORT_TRAINEE, emoji: '📖', roleId: '1385530645186613311', roleId2: '1520680066445742232' }
 };
 
 const TRANSFER_WEBHOOKS = {
@@ -113,15 +47,10 @@ async function sendToDiscord(webhookUrl, data, retries = 3) {
         body: JSON.stringify(data)
       });
       
-      console.log(`📊 Код ответа Discord [попытка ${i + 1}]: ${response.status}`);
-      
-      if (response.ok) {
-        return { success: true, status: response.status };
-      }
+      if (response.ok) return { success: true, status: response.status };
       
       if (response.status === 429) {
         const retryAfter = parseInt(response.headers.get('Retry-After')) || 5;
-        console.warn(`⚠️ Discord вернул 429. Ждём ${retryAfter} секунд...`);
         await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
         continue;
       }
@@ -130,10 +59,8 @@ async function sendToDiscord(webhookUrl, data, retries = 3) {
       return { success: false, status: response.status, error: errorText || `HTTP ${response.status}` };
     } catch (error) {
       lastError = error;
-      console.error(`❌ Попытка ${i + 1}/${retries} не удалась:`, error.message);
       if (i < retries - 1) {
-        const waitTime = 1000 * (i + 1);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
       }
     }
   }
@@ -153,19 +80,17 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  if (isBlacklisted(user.id)) {
+  // Проверка бана через Redis
+  const banned = await isBlacklisted(user.id);
+  if (banned) {
     return res.status(403).json({ 
       error: '⛔ Ваш доступ к системе заявок заблокирован. Обратитесь к администрации.' 
     });
   }
 
-  const spamCheck = checkSpam(user.id, user.username);
-  
-  if (spamCheck.isBanned) {
-    return res.status(429).json({ error: spamCheck.message });
-  }
-  
-  if (spamCheck.message && !spamCheck.isSpam) {
+  // Проверка антиспама
+  const spamCheck = await checkSpam(user.id, user.username);
+  if (spamCheck.isSpam) {
     return res.status(429).json({ error: spamCheck.message });
   }
 
@@ -180,7 +105,7 @@ export default async function handler(req, res) {
     const foundWord = findBadWord(allText);
     
     await sendBanWordAlert(user, username, foundWord || foundWords.join(', '), allText, type, req);
-    addToBlacklist(user.id, username, `Банворд: ${foundWord || foundWords.join(', ')}`);
+    await addToBlacklist(user.id, username, `Банворд: ${foundWord || foundWords.join(', ')}`);
     
     return res.status(403).json({ 
       error: `⛔ Ваша заявка содержит запрещённое слово "${foundWord || foundWords.join(', ')}". Доступ к системе заблокирован.` 
