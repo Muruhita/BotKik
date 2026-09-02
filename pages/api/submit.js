@@ -3,84 +3,29 @@ import { isBlacklisted, addToBlacklist } from '../../lib/blacklist';
 import { containsBadWords, findBadWord, findAllBadWords } from '../../lib/badwords';
 import { checkSpam } from '../../lib/antispam';
 
+const WEBHOOKS = {
+  promotion: process.env.WEBHOOK_PROMOTION,
+  highrank: process.env.WEBHOOK_HIGH_RANK_REPORT,
+  resignation: process.env.WEBHOOK_RESIGNATION,
+  reinstatement: process.env.WEBHOOK_REINSTATEMENT,
+  transferToFib: process.env.WEBHOOK_TRANSFER_TO_FIB,
+  hiring: process.env.WEBHOOK_HIRING,
+  weaponRequest: process.env.WEBHOOK_WEAPON_REQUEST,
+  leave: process.env.WEBHOOK_LEAVE,
+};
+
 const DEPARTMENTS = {
-  'ib': {
-    name: 'IB (Intelligence Branch)',
-    webhook: process.env.WEBHOOK_REPORT_IB,
-    emoji: '🕵️',
-    roleId: '1398200840900055071',
-    roleId2: '1520504887497064639'
-  },
-  'cid': {
-    name: 'CID (Criminal Investigation Department)',
-    webhook: process.env.WEBHOOK_REPORT_CID,
-    emoji: '🔍',
-    roleId: '1398200760843374652',
-    roleId2: '1520680049655676948'
-  },
-  'fa': {
-    name: 'FA (Free Agent)',
-    webhook: process.env.WEBHOOK_REPORT_FA,
-    emoji: '🆓',
-    roleId: '1398200891353468928',
-    roleId2: '1520680052176715876'
-  },
-  'hrt': {
-    name: 'HRT (Hostage Rescue Team)',
-    webhook: process.env.WEBHOOK_REPORT_HRT,
-    emoji: '🛡️',
-    roleId: '1398201557635567636',
-    roleId2: '1520680047038435358'
-  },
-  'atf': {
-    name: 'ATF (Anti Terrorism Force)',
-    webhook: process.env.WEBHOOK_REPORT_ATF,
-    emoji: '💥',
-    roleId: '1520680054731051159',
-    roleId2: '1398201048598057041'
-  },
-  'af': {
-    name: 'AF (Air Force)',
-    webhook: process.env.WEBHOOK_REPORT_AF,
-    emoji: '✈️',
-    roleId: '1398200952602755103',
-    roleId2: '1532529633088635041'
-  },
-  'ocu': {
-    name: 'OCU (Organized Crime Unit)',
-    webhook: process.env.WEBHOOK_REPORT_OCU,
-    emoji: '⚖️',
-    roleId: '1520680060808331294',
-    roleId2: '1418771091291115631'
-  },
-  'dea': {
-    name: 'DEA (Drug Enforcement Administration)',
-    webhook: process.env.WEBHOOK_REPORT_DEA,
-    emoji: '💊',
-    roleId: '1398201115379761283',
-    roleId2: '1274110499356934209'
-  },
-  'fna': {
-    name: 'FNA (Federal National Academy)',
-    webhook: process.env.WEBHOOK_REPORT_FNA,
-    emoji: '📚',
-    roleId: '1520680066445742232',
-    roleId2: '1385530645186613311'
-  },
-  'nsb': {
-    name: 'NSB (National Security Branch)',
-    webhook: process.env.WEBHOOK_REPORT_NSB,
-    emoji: '🏛️',
-    roleId: '1520680069415174275',
-    roleId2: '1398201167154122752'
-  },
-  'trainee': {
-    name: 'Trainee (Стажёр)',
-    webhook: process.env.WEBHOOK_REPORT_TRAINEE,
-    emoji: '📖',
-    roleId: '1385530645186613311',
-    roleId2: '1520680066445742232'
-  }
+  'ib': { name: 'IB (Intelligence Branch)', webhook: process.env.WEBHOOK_REPORT_IB, emoji: '🕵️', roleId: '1398200840900055071', roleId2: '1520504887497064639' },
+  'cid': { name: 'CID (Criminal Investigation)', webhook: process.env.WEBHOOK_REPORT_CID, emoji: '🔍', roleId: '1398200760843374652', roleId2: '1520680049655676948' },
+  'fa': { name: 'FA (Free Agent)', webhook: process.env.WEBHOOK_REPORT_FA, emoji: '🆓', roleId: '1398200891353468928', roleId2: '1520680052176715876' },
+  'hrt': { name: 'HRT (Hostage Rescue)', webhook: process.env.WEBHOOK_REPORT_HRT, emoji: '🛡️', roleId: '1398201557635567636', roleId2: '1520680047038435358' },
+  'atf': { name: 'ATF (Anti Terrorism)', webhook: process.env.WEBHOOK_REPORT_ATF, emoji: '💥', roleId: '1520680054731051159', roleId2: '1398201048598057041' },
+  'af': { name: 'AF (Air Force)', webhook: process.env.WEBHOOK_REPORT_AF, emoji: '✈️', roleId: '1398200952602755103', roleId2: '1532529633088635041' },
+  'ocu': { name: 'OCU (Organized Crime)', webhook: process.env.WEBHOOK_REPORT_OCU, emoji: '⚖️', roleId: '1520680060808331294', roleId2: '1418771091291115631' },
+  'dea': { name: 'DEA (Drug Enforcement)', webhook: process.env.WEBHOOK_REPORT_DEA, emoji: '💊', roleId: '1398201115379761283', roleId2: '1274110499356934209' },
+  'fna': { name: 'FNA (Academy)', webhook: process.env.WEBHOOK_REPORT_FNA, emoji: '📚', roleId: '1520680066445742232', roleId2: '1385530645186613311' },
+  'nsb': { name: 'NSB (National Security)', webhook: process.env.WEBHOOK_REPORT_NSB, emoji: '🏛️', roleId: '1520680069415174275', roleId2: '1398201167154122752' },
+  'trainee': { name: 'Trainee (Стажёр)', webhook: process.env.WEBHOOK_REPORT_TRAINEE, emoji: '📖', roleId: '1385530645186613311', roleId2: '1520680066445742232' }
 };
 
 const TRANSFER_WEBHOOKS = {
@@ -93,12 +38,6 @@ const TRANSFER_WEBHOOKS = {
   'dea': process.env.WEBHOOK_TRANSFER_DEA,
   'fna': process.env.WEBHOOK_TRANSFER_FNA,
   'nsb': process.env.WEBHOOK_TRANSFER_NSB
-};
-
-const webhooks = {
-  promotion: process.env.WEBHOOK_PROMOTION,
-  highrank: process.env.WEBHOOK_HIGH_RANK_REPORT,
-  resignation: process.env.WEBHOOK_RESIGNATION
 };
 
 async function sendToDiscord(webhookUrl, data, retries = 3) {
@@ -201,15 +140,35 @@ export default async function handler(req, res) {
     if (deptInfo && deptInfo.roleId) roleMentions += `<@&${deptInfo.roleId}> `;
     if (deptInfo && deptInfo.roleId2) roleMentions += `<@&${deptInfo.roleId2}>`;
   } else if (type === 'highrank') {
-    webhookUrl = webhooks.highrank;
+    webhookUrl = WEBHOOKS.highrank;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для Хай Рангов не настроен' });
     roleMentions = '<@&1289343511354671125>';
   } else if (type === 'resignation') {
-    webhookUrl = webhooks.resignation;
+    webhookUrl = WEBHOOKS.resignation;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для увольнений не настроен' });
     roleMentions = '<@&1274110499356934211>';
+  } else if (type === 'reinstatement') {
+    webhookUrl = WEBHOOKS.reinstatement;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для восстановления не настроен' });
+    roleMentions = '<@&1274110499356934211>';
+  } else if (type === 'transfer-to-fib') {
+    webhookUrl = WEBHOOKS.transferToFib;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для перевода в FIB не настроен' });
+    roleMentions = '<@&1274110499356934211>';
+  } else if (type === 'hiring') {
+    webhookUrl = WEBHOOKS.hiring;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для трудоустройства не настроен' });
+    roleMentions = '<@&1274110499356934211>';
+  } else if (type === 'weapon-request') {
+    webhookUrl = WEBHOOKS.weaponRequest;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для вооружения не настроен' });
+    roleMentions = '<@&1274110499356934211>';
+  } else if (type === 'leave') {
+    webhookUrl = WEBHOOKS.leave;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для отпуска не настроен' });
+    roleMentions = '<@&1274110499356934211>';
   } else {
-    webhookUrl = webhooks.promotion;
+    webhookUrl = WEBHOOKS.promotion;
     if (!webhookUrl) return res.status(400).json({ error: 'Invalid form type' });
     roleMentions = '<@&1274110499356934211>';
   }
@@ -253,11 +212,16 @@ function getFormTitle(type, department, targetDepartment) {
   }
   if (type === 'highrank') return '📈 Отчёт на повышение (Хай Ранги)';
   if (type === 'resignation') return '📋 Заявление на увольнение';
+  if (type === 'reinstatement') return '🔄 Заявка на восстановление';
+  if (type === 'transfer-to-fib') return '🏛️ Перевод в FIB';
+  if (type === 'hiring') return '📝 Трудоустройство';
+  if (type === 'weapon-request') return '🔫 Спец вооружение';
+  if (type === 'leave') return '🏖️ Заявление на отпуск';
   return { promotion: '📈 Запрос на повышение' }[type] || 'Новая заявка';
 }
 
 function getFormColor(type) {
-  return { promotion: 0x4CAF50, transfer: 0x2196F3, report: 0xFF9800, highrank: 0xFF69B4, resignation: 0xDC3545 }[type] || 0x5865F2;
+  return { promotion: 0x4CAF50, transfer: 0x2196F3, report: 0xFF9800, highrank: 0xFF69B4, resignation: 0xDC3545, reinstatement: 0x00BCD4, 'transfer-to-fib': 0x9C27B0, hiring: 0x4CAF50, 'weapon-request': 0xFF5722, leave: 0x8BC34A }[type] || 0x5865F2;
 }
 
 function buildFields(type, department, targetDepartment, data, userId, username) {
@@ -335,6 +299,57 @@ function buildFields(type, department, targetDepartment, data, userId, username)
 
     fields.push(...baseFields);
     return fields;
+  }
+
+  if (type === 'reinstatement') {
+    return [
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '📌 Предыдущий ранг', value: data.previousRank || 'Не указано', inline: false },
+      { name: '📝 Причина восстановления', value: data.reason || 'Не указано', inline: false },
+      ...baseFields
+    ];
+  }
+
+  if (type === 'transfer-to-fib') {
+    return [
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '🏢 Текущий отдел', value: data.currentDepartment || 'Не указано', inline: false },
+      { name: '📌 Ваш ранг', value: data.rank || 'Не указан', inline: false },
+      { name: '📝 Причина перевода', value: data.reason || 'Не указано', inline: false },
+      { name: '📋 Опыт', value: data.experience || 'Не указано', inline: false },
+      ...baseFields
+    ];
+  }
+
+  if (type === 'hiring') {
+    return [
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '🎂 Возраст', value: data.age || 'Не указано', inline: false },
+      { name: '📋 Опыт', value: data.experience || 'Не указано', inline: false },
+      { name: '🏢 Желаемый отдел', value: data.desiredDepartment || 'Не указано', inline: false },
+      { name: '📝 Почему хотите к нам', value: data.why || 'Не указано', inline: false },
+      ...baseFields
+    ];
+  }
+
+  if (type === 'weapon-request') {
+    return [
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '🔫 Тип вооружения', value: data.weaponType || 'Не указано', inline: false },
+      { name: '📝 Причина', value: data.reason || 'Не указано', inline: false },
+      { name: '⏳ Срок', value: data.duration || 'Не указано', inline: false },
+      ...baseFields
+    ];
+  }
+
+  if (type === 'leave') {
+    return [
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '📅 Начало', value: data.startDate || 'Не указано', inline: false },
+      { name: '📅 Конец', value: data.endDate || 'Не указано', inline: false },
+      { name: '📝 Причина', value: data.reason || 'Не указано', inline: false },
+      ...baseFields
+    ];
   }
 
   return [...baseFields, ...Object.entries(data).map(([key, value]) => ({ name: key, value: String(value) || 'Не указано', inline: false }))];
