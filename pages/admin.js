@@ -11,7 +11,6 @@ export default function AdminPanel() {
     fetch('/api/me')
       .then(res => res.json())
       .then(data => {
-        // Проверяем, что пользователь - админ (твой ID)
         if (!data.user || data.user.id !== '1018113109346504744') {
           router.push('/');
           return;
@@ -47,23 +46,17 @@ export default function AdminPanel() {
     <div style={{ padding: '20px', background: '#0a0a1a', minHeight: '100vh', color: 'white' }}>
       <div style={{ maxWidth: '600px', margin: '0 auto', background: 'rgba(255,255,255,0.05)', padding: '30px', borderRadius: '15px' }}>
         <h1 style={{ marginBottom: '20px' }}>🛠️ Админ Панель</h1>
-        <p style={{ color: '#8b8ba7', marginBottom: '20px' }}>Введите Discord ID пользователя для снятия блокировки (антиспам/банворд)</p>
+        <p style={{ color: '#8b8ba7', marginBottom: '20px' }}>Введите Discord ID пользователя для снятия блокировки</p>
         <input 
           type="text" 
           value={userId} 
           onChange={(e) => setUserId(e.target.value)}
-          placeholder="Discord ID (например, 1018113109346504744)"
-          style={{ 
-            padding: '12px', marginBottom: '15px', width: '100%', boxSizing: 'border-box',
-            background: '#111', color: 'white', border: '1px solid #444', borderRadius: '8px'
-          }}
+          placeholder="Discord ID"
+          style={{ padding: '12px', marginBottom: '15px', width: '100%', boxSizing: 'border-box', background: '#111', color: 'white', border: '1px solid #444', borderRadius: '8px' }}
         />
         <button 
           onClick={handleUnban}
-          style={{ 
-            padding: '12px 20px', background: '#4CAF50', color: 'white', 
-            border: 'none', borderRadius: '8px', cursor: 'pointer', width: '100%', fontSize: '16px'
-          }}
+          style={{ padding: '12px 20px', background: '#4CAF50', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', width: '100%', fontSize: '16px' }}
         >
           🔓 Снять блокировку
         </button>
