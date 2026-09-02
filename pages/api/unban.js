@@ -13,7 +13,6 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  // Проверяем, что пользователь является администратором
   if (!isAdmin(user.id)) {
     return res.status(403).json({ error: 'Недостаточно прав' });
   }
