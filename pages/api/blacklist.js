@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 const BLACKLIST_FILE = path.join(process.cwd(), 'data', 'blacklist.json');
-const ADMIN_IDS = ['1018113109346504744']; // Добавьте сюда ваш Discord ID
+const ADMIN_IDS = ['1018113109346504744']; // Ваш Discord ID
 
 const dataDir = path.join(process.cwd(), 'data');
 if (!fs.existsSync(dataDir)) {
@@ -47,7 +47,6 @@ export function addToBlacklist(userId, username, reason = 'Банворд') {
 }
 
 export function removeFromBlacklist(userId, requesterId) {
-  // Проверяем, что запрашивающий является администратором
   if (!ADMIN_IDS.includes(requesterId)) {
     return { success: false, error: 'Недостаточно прав для снятия блокировки' };
   }
