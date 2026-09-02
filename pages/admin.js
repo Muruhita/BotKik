@@ -11,7 +11,7 @@ export default function AdminPanel() {
     fetch('/api/me')
       .then(res => res.json())
       .then(data => {
-        if (!data.user || data.user.id !== '1018113109346504744') {
+        if (!data.user || data.user.id !== '1018113109346504744','555380718566506506' ) {
           router.push('/');
           return;
         }
