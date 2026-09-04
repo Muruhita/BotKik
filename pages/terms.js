@@ -52,7 +52,7 @@ export default function Terms() {
           <p><strong>7. Контакты</strong></p>
           <p><strong>Оператор:</strong> Mur Kiratu</p>
           <p><strong>Email:</strong> muruh1ta@discord.com</p>
-          <p><strong>Другие контакты:</strong> Discord сервер поддержки: <a href="https://discord.gg/DgKgdERSkj" target="_blank" rel="noopener noreferrer">https://discord.gg/DgKgdERSkj</a> (Saketo)</p>
+          <p><strong>Другие контакты:</strong> Discord сервер поддержки: Saketo</p>
           <p>ДАННЫЕ "Условия Пользования" ЯВЛЯЮТСЯ ШУТОЧНЫМИ И ЧИСТО ДЛЯ КРАСИВОГО ВИДА САЙТА</p>
         </div>
       </div>
