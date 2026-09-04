@@ -54,8 +54,8 @@ export default function Dashboard() {
         }
         .card:hover {
           transform: translateY(-8px);
-          border-color: #5865F2;
-          box-shadow: 0 15px 30px rgba(88, 101, 242, 0.25);
+          border-color: #A855F7;
+          box-shadow: 0 15px 30px rgba(168, 85, 247, 0.4);
         }
         .card-icon {
           font-size: 48px;
