@@ -65,7 +65,7 @@ export default function Layout({ children }) {
         <span className="footer-sep">•</span>
         <a href="/privacy" className="footer-link">Полезные ссылки</a>
         <span className="footer-sep">•</span>
-        <span className="footer-author">Автор: @murkilanki</span>
+        <span className="footer-author">Автор: @muruh1ta</span>
       </footer>
 
       <style jsx>{`
