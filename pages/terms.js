@@ -1,98 +1,218 @@
 import Layout from '../components/Layout';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Terms() {
+  const [gameState, setGameState] = useState('idle'); // idle | playing | finished
+  const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(15);
+  const [target, setTarget] = useState({ x: 0, y: 0, visible: true });
+  const timerRef = useRef(null);
+  const boardRef = useRef(null);
+
+  // Запуск игры
+  const startGame = () => {
+    setScore(0);
+    setTimeLeft(15);
+    setGameState('playing');
+    moveTarget();
+  };
+
+  // Остановка игры
+  const stopGame = () => {
+    clearInterval(timerRef.current);
+    setGameState('finished');
+  };
+
+  // Перемещение цели в случайную позицию
+  const moveTarget = () => {
+    const board = boardRef.current;
+    if (!board) return;
+    const rect = board.getBoundingClientRect();
+    const x = Math.random() * (rect.width - 50);
+    const y = Math.random() * (rect.height - 50);
+    setTarget({ x, y, visible: true });
+  };
+
+  // Попадание по цели
+  const catchTarget = (e) => {
+    e.stopPropagation();
+    setScore(prev => prev + 1);
+    setTarget(prev => ({ ...prev, visible: false }));
+    setTimeout(() => {
+      moveTarget();
+      setTarget(prev => ({ ...prev, visible: true }));
+    }, 150);
+  };
+
+  // Клик по фону (мимо) — уменьшаем время?
+  const handleBoardClick = () => {
+    // Не наказываем, просто ничего
+  };
+
+  // Таймер
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          setGameState('finished');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  }, [gameState]);
+
+  const getRating = (s) => {
+    if (s >= 15) return '🏆 Легенда FIB!';
+    if (s >= 10) return '🔥 Отличный агент!';
+    if (s >= 5) return '👍 Неплохо!';
+    return '🐢 Ты медленный...';
+  };
+
   return (
     <Layout>
-      <div className="terms-container">
-        <h1>Условия использования (Terms of Service). ДАННЫЕ "Условия Пользования" ЯВЛЯЮТСЯ ШУТОЧНЫМИ И ЧИСТО ДЛЯ КРАСИВОГО ВИДА САЙТА</h1>
-        <div className="terms-content">
-          <p><strong>1. Общие положения</strong></p>
-          <p>1.1. Настоящие Условия использования (далее — «Условия») регулируют отношения между Оператором и Пользователями при использовании Discord-бота - Kimu
-          <p>1.2. Добавляя Бота на свой сервер или отправляя ему команды, вы принимаете данные Условия в полном объёме.</p>
-          <p>1.3. Если вы не согласны, немедленно удалите Бота со своего сервера и прекратите любое взаимодействие.</p>
-          <p>1.4. Условия действуют совместно с Политикой конфиденциальности (ссылка).</p>
+      <div className="game-container">
+        <h1>🎮 Мини-игра</h1>
+        <p className="description">Поймай агента FIB! Кликай по значку 🔍, пока не вышло время.</p>
 
-          <p><strong>2. Предоставление услуг</strong></p>
-          <p>2.1. Бот предоставляется «как есть» (AS IS) без каких-либо гарантий бесперебойной работы или соответствия вашим ожиданиям.</p>
-          <p>2.2. Оператор может изменять функционал, добавлять или удалять команды без предварительного уведомления.</p>
-          <p>2.3. Бот предназначен для Заявок FIB на проекте Majestic RP.</p>
+        {gameState === 'idle' && (
+          <button className="start-btn" onClick={startGame}>Начать игру</button>
+        )}
 
-          <p><strong>3. Права и обязанности пользователя</strong></p>
-          <p>3.1. Пользователь обязуется:</p>
-          <p>- Использовать Бота только в добрых целях, не нарушая правила Discord;</p>
-          <p>- Не отправлять Боту контент, запрещённый правилами Discord (спам, вредоносные ссылки);</p>
-          <p>- Не пытаться взламывать Бота, перехватывать его трафик или проводить DDoS-атаки;</p>
-          <p>- Не использовать Бота для создания материалов, нарушающих авторские или смежные права.</p>
-          <p>3.2. Пользователь несёт полную ответственность за действия, совершённые с использованием его учётной записи Discord при взаимодействии с Ботом.</p>
+        {gameState === 'playing' && (
+          <div className="game-area">
+            <div className="game-info">
+              <span>⏱ Осталось: {timeLeft} сек.</span>
+              <span>⭐ Очки: {score}</span>
+            </div>
+            <div ref={boardRef} className="game-board" onClick={handleBoardClick}>
+              {target.visible && (
+                <div className="target" style={{ left: target.x, top: target.y }} onClick={catchTarget}>
+                  🔍
+                </div>
+              )}
+            </div>
+            <button className="reset-btn" onClick={stopGame}>Завершить досрочно</button>
+          </div>
+        )}
 
-          <p><strong>4. Интеллектуальная собственность — ВАЖНО</strong></p>
-          <p>4.1. Исключительные права на исходный код, архитектуру, алгоритмы, дизайн и логику Бота принадлежат Оператору.</p>
-          <p>4.2. <strong>Категорически запрещается</strong> без письменного разрешения Оператора:</p>
-          <p>- Копировать, воспроизводить, распространять любую часть кода или логики;</p>
-          <p>- Декомпилировать, дизассемблировать, реверсировать (reverse-engineer) Бот;</p>
-          <p>- Создавать производные работы, клоны или аналоги, основанные на работе Бота;</p>
-          <p>- Использовать Бот как источник данных для обучения искусственного интеллекта или конкурентных сервисов;</p>
-          <p>- Парсить или сканировать Бота автоматизированными средствами для извлечения информации.</p>
-          <p>4.3. Любая попытка несанкционированного доступа к серверной части Бота, вмешательства в его работу или использования уязвимостей будет расцениваться как нарушение и может повлечь ответственность по ст. 272 УК РФ (Неправомерный доступ к компьютерной информации) и ст. 146 УК РФ (Нарушение авторских прав).</p>
-          <p>4.4. <strong>Контент, сгенерированный пользователем через Бота</strong> (текст, изображения и т.п.), не является собственностью Оператора, если иное не оговорено отдельно. Однако пользователь не вправе утверждать, что этот контент был создан без использования Бота, если это не соответствует действительности.</p>
-
-          <p><strong>5. Ограничение ответственности</strong></p>
-          <p>5.1. Оператор не несёт ответственности за:</p>
-          <p>- Любые убытки (прямые или косвенные), понесённые пользователем в результате использования или невозможности использования Бота;</p>
-          <p>- Точность, достоверность и полноту информации, полученной от Бота (особенно актуально для AI-ботов);</p>
-          <p>- Действия третьих лиц, включая сбои Discord, хостинг-провайдеров или внешних API;</p>
-          <p>- Потерю данных, если Бот выполняет функции хранения (например, экономию настроек).</p>
-          <p>5.2. Максимальный размер ответственности ограничен стоимостью платных услуг, оплаченных пользователем за последние 30 дней (если применимо).</p>
-
-          <p><strong>6. Изменение Условий</strong></p>
-          <p>6.1. Оператор вправе обновлять Условия в любое время.</p>
-          <p>6.2. Новая редакция публикуется по той же ссылке, дата обновления указывается в начале документа.</p>
-          <p>6.3. Продолжение использования Бота после изменений означает ваше согласие с новой версией.</p>
-
-          <p><strong>7. Контакты</strong></p>
-          <p><strong>Оператор:</strong> Mur</p>
-          <p><strong>Email:</strong> muruh1ta@discord.com</p>
-          <p><strong>Другие контакты:</strong> Discord сервер поддержки: Saketo</p>
-          <p>ДАННЫЕ "Условия Пользования" ЯВЛЯЮТСЯ ШУТОЧНЫМИ И ЧИСТО ДЛЯ КРАСИВОГО ВИДА САЙТА</p>
-        </div>
+        {gameState === 'finished' && (
+          <div className="game-results">
+            <p className="final-score">Ты поймал {score} агентов!</p>
+            <p className="rating">{getRating(score)}</p>
+            <button className="start-btn" onClick={startGame}>Сыграть ещё раз</button>
+          </div>
+        )}
       </div>
 
       <style jsx>{`
-        .terms-container {
-          max-width: 900px;
+        .game-container {
+          max-width: 600px;
           margin: 0 auto;
-          padding: 20px;
+          text-align: center;
+          padding: 30px;
+          background: #161616;
+          border: 1px solid #333;
+          border-radius: 20px;
+          min-height: 400px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
         }
         h1 {
           color: white;
-          font-size: 32px;
+          margin-bottom: 10px;
+        }
+        .description {
+          color: #888;
           margin-bottom: 30px;
-          text-align: center;
         }
-        .terms-content {
-          background: #161616;
-          border: 1px solid #333;
-          border-radius: 16px;
-          padding: 30px;
+        .start-btn {
+          background: #5865F2;
+          color: white;
+          border: none;
+          padding: 15px 40px;
+          font-size: 18px;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.3s;
         }
-        .terms-content p {
+        .start-btn:hover {
+          background: #4752C4;
+          transform: scale(1.05);
+        }
+        .game-area {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 15px;
+        }
+        .game-info {
+          display: flex;
+          justify-content: space-between;
+          width: 100%;
           color: #aaa;
-          font-size: 15px;
-          line-height: 1.7;
-          margin-bottom: 15px;
+          font-size: 18px;
+          font-weight: bold;
         }
-        .terms-content p strong {
-          color: #fff;
-          font-size: 16px;
-          margin-top: 20px;
-          display: block;
+        .game-board {
+          position: relative;
+          width: 100%;
+          height: 300px;
+          background: #0a0a0a;
+          border: 2px solid #333;
+          border-radius: 12px;
+          overflow: hidden;
+          cursor: crosshair;
         }
-        .terms-content a {
-          color: #5865F2;
-          text-decoration: none;
+        .target {
+          position: absolute;
+          width: 50px;
+          height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 30px;
+          cursor: pointer;
+          user-select: none;
+          transition: transform 0.1s;
         }
-        .terms-content a:hover {
-          text-decoration: underline;
+        .target:hover {
+          transform: scale(1.2);
+        }
+        .reset-btn {
+          background: #444;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 14px;
+          transition: background 0.3s;
+        }
+        .reset-btn:hover {
+          background: #555;
+        }
+        .game-results {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 15px;
+        }
+        .final-score {
+          color: white;
+          font-size: 28px;
+          margin: 0;
+        }
+        .rating {
+          color: #FFD700;
+          font-size: 24px;
+          margin: 0;
         }
       `}</style>
     </Layout>
