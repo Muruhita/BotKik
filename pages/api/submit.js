@@ -96,12 +96,16 @@ export default async function handler(req, res) {
   let webhookUrl;
   let roleMentions = '';
 
-  // ОПРЕДЕЛЯЕМ ВЕБХУК И РОЛИ
+  // Определяем вебхук и роли для пинга
   if (type === 'withdrawal' || type === 'reinstatement' || type === 'transferToFib') {
     webhookUrl = webhooks[type];
     if (!webhookUrl) return res.status(500).json({ error: `Вебхук для ${type} не настроен` });
-    // Исправлено: роли одной строкой через пробел!
     roleMentions = '<@&1274110499377778755> <@&1274110499377778756>';
+  } else if (type === 'weaponRequest') {
+    webhookUrl = webhooks.weaponRequest;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для спец вооружения не настроен' });
+    // ⬇️ ИЗМЕНЕНИЕ: только эта роль!
+    roleMentions = '<@&1385513451077636136>';
   } else if (type === 'leave') {
     webhookUrl = webhooks.leave;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для отпуска не настроен' });
@@ -114,10 +118,6 @@ export default async function handler(req, res) {
     webhookUrl = webhooks.highrank;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для высоких рангов не настроен' });
     roleMentions = '<@&1289343511354671125>';
-  } else if (type === 'weaponRequest') {
-    webhookUrl = webhooks.weaponRequest;
-    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для GunsRequest не настроен' });
-    roleMentions = '<@&1385513451077636136>';
   } else if (type === 'resignation') {
     webhookUrl = webhooks.resignation;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для увольнений не настроен' });
@@ -196,7 +196,7 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     { name: '🆔 Discord ID', value: userId, inline: true }
   ];
 
-  // ============ КРАСИВЫЕ ПОЛЯ ДЛЯ ВСЕХ ОТДЕЛОВ ============
+  // ОТЧЁТ О ПОВЫШЕНИИ (КРАСИВЫЕ ПОЛЯ)
   if (type === 'report') {
     const dept = DEPARTMENTS[department];
     const instructorText = data.isInstructor === 'yes' ? '✅ Да' : '❌ Нет';
@@ -211,7 +211,7 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     ];
   }
 
-  // ============ КРАСИВЫЕ ПОЛЯ ДЛЯ ПЕРЕВОДОВ ============
+  // ПЕРЕВОД В ОТДЕЛ (КРАСИВЫЕ ПОЛЯ)
   if (type === 'transfer') {
     const fields = [
       { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
@@ -243,7 +243,7 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     return fields;
   }
 
-  // ============ ОСТАЛЬНЫЕ НОВЫЕ ФОРМЫ ============
+  // ОСТАЛЬНЫЕ ФОРМЫ
   if (type === 'withdrawal') {
     return [
       { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
@@ -294,7 +294,6 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     ];
   }
 
-  // ============ СТАРЫЕ ФОРМЫ ============
   if (type === 'promotion') {
     return [
       { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
@@ -321,6 +320,5 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     ];
   }
 
-  // Fallback (не должен срабатывать для вышеуказанных типов)
   return [...baseFields, ...Object.entries(data).map(([key, value]) => ({ name: key, value: String(value) || 'Не указано', inline: false }))];
 }
