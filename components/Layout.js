@@ -25,7 +25,7 @@ export default function Layout({ children }) {
     { name: 'Формы', path: '/dashboard', icon: '📝' },
     { name: 'Профиль', path: '/profile', icon: '👤' },
     { name: 'Справка', path: '/help', icon: '📖' },
-    ...(isAdmin ? [{ name: 'Админ', path: '/admin', icon: '🛠️' }] : []),
+    ...(isAdmin ? [{ name: 'Admin.A.', path: '/admin', icon: '🛠️' }] : []),
   ];
 
   return (
@@ -62,7 +62,7 @@ export default function Layout({ children }) {
         <span className="footer-sep">•</span>
         <a href="/privacy" className="footer-link">Политика конфиденциальности</a>
         <span className="footer-sep">•</span>
-        <span className="footer-author">Автор: @murkilanki</span>
+        <span className="footer-author">Автор: @muruh1ta</span>
       </footer>
 
       <style jsx>{`
