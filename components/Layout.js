@@ -1,11 +1,12 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
+const ADMIN_IDS = ['1018113109346504744', '555380718566506506', '260076815970729985'];
+
 export default function Layout({ children }) {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/me')
@@ -16,11 +17,7 @@ export default function Layout({ children }) {
           return;
         }
         setUser(data.user);
-        setIsAdmin(data.user.id === '1018113109346504744');
-        setLoading(false);
-      })
-      .catch(() => {
-        router.push('/');
+        setIsAdmin(ADMIN_IDS.includes(data.user.id));
       });
   }, []);
 
@@ -30,39 +27,6 @@ export default function Layout({ children }) {
     { name: 'Справка', path: '/help', icon: '📖' },
     ...(isAdmin ? [{ name: 'Админ', path: '/admin', icon: '🛠️' }] : []),
   ];
-
-  // Показываем загрузку, пока проверяем права
-  if (loading) {
-    return (
-      <div className="loading-screen">
-        <div className="loading-spinner"></div>
-        <p>Проверка авторизации...</p>
-        <style jsx>{`
-          .loading-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background: #0a0a0a;
-            color: white;
-          }
-          .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255,255,255,0.2);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
-          }
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
-      </div>
-    );
-  }
 
   return (
     <div className="app-container">
@@ -137,10 +101,6 @@ export default function Layout({ children }) {
           display: flex;
           align-items: center;
           gap: 15px;
-        }
-        .nav-user span {
-          color: #aaa;
-          font-size: 14px;
         }
         .nav-user button {
           background: #444;
