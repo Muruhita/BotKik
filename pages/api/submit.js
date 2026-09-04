@@ -97,7 +97,7 @@ export default async function handler(req, res) {
   let roleMentions = '';
 
   // ОПРЕДЕЛЯЕМ ВЕБХУК И РОЛИ
-  if (type === 'withdrawal' || type === 'reinstatement' || type === 'transferToFib' || type === 'weaponRequest') {
+  if (type === 'withdrawal' || type === 'reinstatement' || type === 'transferToFib') {
     webhookUrl = webhooks[type];
     if (!webhookUrl) return res.status(500).json({ error: `Вебхук для ${type} не настроен` });
     // Исправлено: роли одной строкой через пробел!
@@ -114,6 +114,10 @@ export default async function handler(req, res) {
     webhookUrl = webhooks.highrank;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для высоких рангов не настроен' });
     roleMentions = '<@&1289343511354671125>';
+  } else if (type === 'weaponRequest') {
+    webhookUrl = webhooks.weaponRequest;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для GunsRequest не настроен' });
+    roleMentions = '<@&1385513451077636136>';
   } else if (type === 'resignation') {
     webhookUrl = webhooks.resignation;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для увольнений не настроен' });
