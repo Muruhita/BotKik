@@ -13,7 +13,6 @@ export default function Dashboard() {
     { title: 'Восстановление', icon: '🔁', path: '/forms/reinstatement', desc: 'Вернуться в FIB' },
     { title: 'Перевод в FIB', icon: '🏛️', path: '/forms/transfer-to-fib', desc: 'Перевестись в FIB' },
     { title: 'Спец Вооружение', icon: '🔫', path: '/forms/weapon-request', desc: 'Запросить оружие' },
-    { title: 'Отпуск', icon: '🌴', path: '/forms/leave', desc: 'Взять отпуск' },
     { title: 'Снятие ЧС', icon: '🚫', path: '/forms/withdrawal', desc: 'Снять ЧС' },
   ];
 
