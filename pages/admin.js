@@ -1,11 +1,27 @@
 import Layout from '../components/Layout';
 import { useState, useEffect } from 'react';
 
+const ADMIN_IDS = ['1018113109346504744', '555380718566506506', '260076815970729985'];
+
 export default function AdminPanel() {
   const [bannedUsers, setBannedUsers] = useState([]);
   const [formsActive, setFormsActive] = useState(true);
   const [userId, setUserId] = useState('');
   const [status, setStatus] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/me')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.user || !ADMIN_IDS.includes(data.user.id)) {
+          // Если не админ, можно редиректнуть
+          return;
+        }
+        setIsAdmin(true);
+        loadData();
+      });
+  }, []);
 
   const loadData = async () => {
     const res = await fetch('/api/admin/list');
@@ -13,10 +29,6 @@ export default function AdminPanel() {
     setBannedUsers(data.bannedUsers || []);
     setFormsActive(data.formsActive);
   };
-
-  useEffect(() => {
-    loadData();
-  }, []);
 
   const handleUnban = async () => {
     if (!userId.trim()) return;
@@ -39,6 +51,8 @@ export default function AdminPanel() {
     const data = await res.json();
     setFormsActive(data.formsActive);
   };
+
+  if (!isAdmin) return <p>Доступ запрещён</p>;
 
   return (
     <Layout>
