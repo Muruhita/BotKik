@@ -1,6 +1,8 @@
 import Layout from '../components/Layout';
 import { useState, useEffect } from 'react';
 
+const ADMIN_IDS = ['1018113109346504744', '555380718566506506', '260076815970729985'];
+
 export default function Help() {
   const [content, setContent] = useState('Загрузка...');
   const [isAdmin, setIsAdmin] = useState(false);
@@ -17,7 +19,7 @@ export default function Help() {
     fetch('/api/me')
       .then(res => res.json())
       .then(data => {
-        setIsAdmin(data.user && data.user.id === '1018113109346504744');
+        setIsAdmin(data.user && ADMIN_IDS.includes(data.user.id));
       });
   }, []);
 
