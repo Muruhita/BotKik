@@ -25,7 +25,7 @@ export default function Layout({ children }) {
     { name: 'Формы', path: '/dashboard', icon: '📝' },
     { name: 'Профиль', path: '/profile', icon: '👤' },
     { name: 'Справка', path: '/help', icon: '📖' },
-    ...(isAdmin ? [{ name: 'Admin.A.', path: '/admin', icon: '🛠️' }] : []),
+    ...(isAdmin ? [{ name: 'Админ', path: '/admin', icon: '🛠️' }] : []),
   ];
 
   return (
@@ -56,13 +56,16 @@ export default function Layout({ children }) {
         {children}
       </main>
 
+      {/* Маленькая аниме-картинка снизу справа */}
+      <img src="/fumo.png" alt="Fumo" className="fumo-bg" />
+
       {/* Футер с маленькими кнопками */}
       <footer className="footer">
         <a href="/terms" className="footer-link">Условия Пользования</a>
         <span className="footer-sep">•</span>
         <a href="/privacy" className="footer-link">Политика конфиденциальности</a>
         <span className="footer-sep">•</span>
-        <span className="footer-author">Автор: @muruh1ta</span>
+        <span className="footer-author">Автор: @murkilanki</span>
       </footer>
 
       <style jsx>{`
@@ -72,6 +75,8 @@ export default function Layout({ children }) {
           color: white;
           display: flex;
           flex-direction: column;
+          position: relative;
+          overflow: hidden;
         }
         .navbar {
           display: flex;
@@ -147,6 +152,20 @@ export default function Layout({ children }) {
           to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Маленькая аниме-картинка снизу справа */
+        .fumo-bg {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          width: 70px;
+          height: auto;
+          opacity: 0.15; /* Делаем почти прозрачной, чтобы не мешала */
+          pointer-events: none; /* Клики проходят сквозь неё */
+          z-index: 5; /* Над фоном, но под контентом */
+          user-select: none;
+          -webkit-user-drag: none;
+        }
+
         /* Футер */
         .footer {
           display: flex;
@@ -159,6 +178,8 @@ export default function Layout({ children }) {
           font-size: 13px;
           color: #777;
           flex-wrap: wrap;
+          z-index: 10;
+          position: relative;
         }
         .footer-link {
           background: transparent;
