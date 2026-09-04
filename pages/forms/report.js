@@ -3,17 +3,17 @@ import { useRouter } from 'next/router';
 import Layout from '../../components/Layout';
 
 const DEPARTMENTS = [
-  { id: 'ib', name: 'IB', emoji: '🕵️' },
-  { id: 'cid', name: 'CID', emoji: '🔍' },
-  { id: 'fa', name: 'FA', emoji: '🆓' },
-  { id: 'hrt', name: 'HRT', emoji: '🛡️' },
-  { id: 'atf', name: 'ATF', emoji: '💥' },
-  { id: 'af', name: 'AF', emoji: '✈️' },
-  { id: 'ocu', name: 'OCU', emoji: '⚖️' },
-  { id: 'dea', name: 'DEA', emoji: '💊' },
-  { id: 'fna', name: 'FNA', emoji: '📚' },
-  { id: 'nsb', name: 'NSB', emoji: '🏛️' },
-  { id: 'trainee', name: 'Trainee', emoji: '📖' }
+  { id: 'ib', name: 'IB (Intelligence Branch)', emoji: '🕵️' },
+  { id: 'cid', name: 'CID (Criminal Investigation)', emoji: '🔍' },
+  { id: 'fa', name: 'FA (Free Agent)', emoji: '🆓' },
+  { id: 'hrt', name: 'HRT (Hostage Rescue)', emoji: '🛡️' },
+  { id: 'atf', name: 'ATF (Anti Terrorism)', emoji: '💥' },
+  { id: 'af', name: 'AF (Air Force)', emoji: '✈️' },
+  { id: 'ocu', name: 'OCU (Organized Crime)', emoji: '⚖️' },
+  { id: 'dea', name: 'DEA (Drug Enforcement)', emoji: '💊' },
+  { id: 'fna', name: 'FNA (Academy)', emoji: '📚' },
+  { id: 'nsb', name: 'NSB (National Security)', emoji: '🏛️' },
+  { id: 'trainee', name: 'Trainee (Стажёр)', emoji: '📖' }
 ];
 
 const RANKS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
@@ -47,6 +47,9 @@ export default function ReportForm() {
       setUser(meData.user);
       if (profileData.nickname) {
         setFormData(prev => ({ ...prev, fullName: profileData.nickname }));
+      }
+      if (profileData.department) {
+        setFormData(prev => ({ ...prev, department: profileData.department }));
       }
       setLoading(false);
     });
@@ -141,6 +144,7 @@ export default function ReportForm() {
           </form>
         </div>
       </div>
+
       <style jsx>{`
         .form-page { min-height: calc(100vh - 60px); padding: 30px; }
         .back-btn { background: rgba(255, 255, 255, 0.08); color: #aaa; border: 1px solid rgba(255, 255, 255, 0.15); padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-bottom: 20px; transition: all 0.3s; font-size: 14px; }
