@@ -104,7 +104,6 @@ export default async function handler(req, res) {
   } else if (type === 'weaponRequest') {
     webhookUrl = webhooks.weaponRequest;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для спец вооружения не настроен' });
-    // ⬇️ ИЗМЕНЕНИЕ: только эта роль!
     roleMentions = '<@&1385513451077636136>';
   } else if (type === 'leave') {
     webhookUrl = webhooks.leave;
@@ -243,22 +242,36 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     return fields;
   }
 
+  // ===== ИСПРАВЛЕННЫЕ weaponRequest и leave с использованием department =====
+  if (type === 'weaponRequest') {
+    return [
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '📌 Ваш ранг', value: data.rank || 'Не указан', inline: false },
+      // ✅ Теперь используем department из запроса
+      { name: '🏢 Ваш отдел', value: department || 'Не указан', inline: false },
+      { name: '🔫 Предмет на выбор', value: data.item || 'Не указан', inline: false },
+      ...baseFields
+    ];
+  }
+
+  if (type === 'leave') {
+    return [
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      // ✅ Теперь используем department из запроса
+      { name: '🏢 Отдел', value: department || 'Не указан', inline: false },
+      { name: '📝 Причина', value: data.reason || 'Не указана', inline: false },
+      { name: '📅 Начало', value: data.startDate || 'Не указано', inline: false },
+      { name: '📅 Конец', value: data.endDate || 'Не указано', inline: false },
+      ...baseFields
+    ];
+  }
+
   // ОСТАЛЬНЫЕ ФОРМЫ
   if (type === 'withdrawal') {
     return [
       { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
       { name: '🚨 Причина ЧС', value: data.reason || 'Не указана', inline: false },
       { name: '📅 Дата выдачи ЧС', value: data.date || 'Не указана', inline: false },
-      ...baseFields
-    ];
-  }
-
-  if (type === 'weaponRequest') {
-    return [
-      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
-      { name: '📌 Ваш ранг', value: data.rank || 'Не указан', inline: false },
-      { name: '🏢 Ваш отдел', value: data.department || 'Не указан', inline: false },
-      { name: '🔫 Предмет на выбор', value: data.item || 'Не указан', inline: false },
       ...baseFields
     ];
   }
@@ -279,17 +292,6 @@ function buildFields(type, department, targetDepartment, data, userId, username)
       { name: '👤 Имя Фамилия | Статик ID', value: data.fullName || 'Не указано', inline: false },
       { name: '✅ Одобрение', value: data.approval || 'Не указано', inline: false },
       { name: '📸 Доказательство ранга', value: data.rankProof || 'Не указано', inline: false },
-      ...baseFields
-    ];
-  }
-
-  if (type === 'leave') {
-    return [
-      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
-      { name: '🏢 Отдел', value: data.department || 'Не указан', inline: false },
-      { name: '📝 Причина', value: data.reason || 'Не указана', inline: false },
-      { name: '📅 Начало', value: data.startDate || 'Не указано', inline: false },
-      { name: '📅 Конец', value: data.endDate || 'Не указано', inline: false },
       ...baseFields
     ];
   }
