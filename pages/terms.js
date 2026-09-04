@@ -50,7 +50,7 @@ export default function Terms() {
           <p>6.3. Продолжение использования Бота после изменений означает ваше согласие с новой версией.</p>
 
           <p><strong>7. Контакты</strong></p>
-          <p><strong>Оператор:</strong> Mur Kiratu</p>
+          <p><strong>Оператор:</strong> Mur</p>
           <p><strong>Email:</strong> muruh1ta@discord.com</p>
           <p><strong>Другие контакты:</strong> Discord сервер поддержки: Saketo</p>
           <p>ДАННЫЕ "Условия Пользования" ЯВЛЯЮТСЯ ШУТОЧНЫМИ И ЧИСТО ДЛЯ КРАСИВОГО ВИДА САЙТА</p>
