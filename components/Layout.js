@@ -31,7 +31,10 @@ export default function Layout({ children }) {
   return (
     <div className="app-container">
       <nav className="navbar">
-        <div className="nav-logo">🏛️ FIB Forms</div>
+        <div className="nav-logo">
+          <img src="/logo.png" alt="FIB Logo" className="nav-logo-img" />
+          <span>FIB Forms</span>
+        </div>
         <div className="nav-tabs">
           {tabs.map(tab => (
             <button 
@@ -71,9 +74,17 @@ export default function Layout({ children }) {
           z-index: 100;
         }
         .nav-logo {
+          display: flex;
+          align-items: center;
+          gap: 10px;
           font-size: 20px;
           font-weight: bold;
           color: #fff;
+        }
+        .nav-logo-img {
+          width: 28px;
+          height: 28px;
+          object-fit: contain;
         }
         .nav-tabs {
           display: flex;
