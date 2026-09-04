@@ -61,9 +61,9 @@ export default function Layout({ children }) {
 
       {/* Футер с маленькими кнопками */}
       <footer className="footer">
-        <a href="/terms" className="footer-link">Условия Пользования</a>
+        <a href="/terms" className="footer-link">Мини-Игра</a>
         <span className="footer-sep">•</span>
-        <a href="/privacy" className="footer-link">Политика конфиденциальности</a>
+        <a href="/privacy" className="footer-link">Полезные ссылки</a>
         <span className="footer-sep">•</span>
         <span className="footer-author">Автор: @murkilanki</span>
       </footer>
