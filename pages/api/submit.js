@@ -4,17 +4,17 @@ import { containsBadWords, findBadWord, findAllBadWords } from '../../lib/badwor
 import { checkSpam, isFormSubmissionActive } from '../../lib/antispam';
 
 const DEPARTMENTS = {
-  'ib': { name: 'IB', webhook: process.env.WEBHOOK_REPORT_IB, emoji: '🕵️' },
-  'cid': { name: 'CID', webhook: process.env.WEBHOOK_REPORT_CID, emoji: '🔍' },
-  'fa': { name: 'FA', webhook: process.env.WEBHOOK_REPORT_FA, emoji: '🆓' },
-  'hrt': { name: 'HRT', webhook: process.env.WEBHOOK_REPORT_HRT, emoji: '🛡️' },
-  'atf': { name: 'ATF', webhook: process.env.WEBHOOK_REPORT_ATF, emoji: '💥' },
-  'af': { name: 'AF', webhook: process.env.WEBHOOK_REPORT_AF, emoji: '✈️' },
-  'ocu': { name: 'OCU', webhook: process.env.WEBHOOK_REPORT_OCU, emoji: '⚖️' },
-  'dea': { name: 'DEA', webhook: process.env.WEBHOOK_REPORT_DEA, emoji: '💊' },
-  'fna': { name: 'FNA', webhook: process.env.WEBHOOK_REPORT_FNA, emoji: '📚' },
-  'nsb': { name: 'NSB', webhook: process.env.WEBHOOK_REPORT_NSB, emoji: '🏛️' },
-  'trainee': { name: 'Trainee', webhook: process.env.WEBHOOK_REPORT_TRAINEE, emoji: '📖' }
+  'ib': { name: 'IB', webhook: process.env.WEBHOOK_REPORT_IB, emoji: '🕵️', roleId: '1398200840900055071', roleId2: '1520504887497064639' },
+  'cid': { name: 'CID', webhook: process.env.WEBHOOK_REPORT_CID, emoji: '🔍', roleId: '1398200760843374652', roleId2: '1520680049655676948' },
+  'fa': { name: 'FA', webhook: process.env.WEBHOOK_REPORT_FA, emoji: '🆓', roleId: '1398200891353468928', roleId2: '1520680052176715876' },
+  'hrt': { name: 'HRT', webhook: process.env.WEBHOOK_REPORT_HRT, emoji: '🛡️', roleId: '1398201557635567636', roleId2: '1520680047038435358' },
+  'atf': { name: 'ATF', webhook: process.env.WEBHOOK_REPORT_ATF, emoji: '💥', roleId: '1520680054731051159', roleId2: '1398201048598057041' },
+  'af': { name: 'AF', webhook: process.env.WEBHOOK_REPORT_AF, emoji: '✈️', roleId: '1398200952602755103', roleId2: '1532529633088635041' },
+  'ocu': { name: 'OCU', webhook: process.env.WEBHOOK_REPORT_OCU, emoji: '⚖️', roleId: '1520680060808331294', roleId2: '1418771091291115631' },
+  'dea': { name: 'DEA', webhook: process.env.WEBHOOK_REPORT_DEA, emoji: '💊', roleId: '1398201115379761283', roleId2: '1274110499356934209' },
+  'fna': { name: 'FNA', webhook: process.env.WEBHOOK_REPORT_FNA, emoji: '📚', roleId: '1520680066445742232', roleId2: '1385530645186613311' },
+  'nsb': { name: 'NSB', webhook: process.env.WEBHOOK_REPORT_NSB, emoji: '🏛️', roleId: '1520680069415174275', roleId2: '1398201167154122752' },
+  'trainee': { name: 'Trainee', webhook: process.env.WEBHOOK_REPORT_TRAINEE, emoji: '📖', roleId: '1385530645186613311', roleId2: '1520680066445742232' }
 };
 
 const TRANSFER_WEBHOOKS = {
@@ -96,32 +96,57 @@ export default async function handler(req, res) {
   let webhookUrl;
   let roleMentions = '';
 
+  // Заполняем roleMentions для всех типов форм!
   if (type === 'withdrawal') {
     webhookUrl = webhooks.withdrawal;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для снятия ЧС не настроен' });
     roleMentions = '<@&1274110499356934211>';
   } else if (type === 'reinstatement') {
     webhookUrl = webhooks.reinstatement;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для восстановления не настроен' });
+    roleMentions = '<@&1274110499356934211>';
   } else if (type === 'transferToFib') {
     webhookUrl = webhooks.transferToFib;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для перевода в FIB не настроен' });
+    roleMentions = '<@&1274110499356934211>';
   } else if (type === 'weaponRequest') {
     webhookUrl = webhooks.weaponRequest;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для спец вооружения не настроен' });
+    roleMentions = '<@&1274110499356934211>';
   } else if (type === 'leave') {
     webhookUrl = webhooks.leave;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для отпуска не настроен' });
+    roleMentions = '<@&1274110499356934211>';
+  } else if (type === 'promotion') {
+    webhookUrl = webhooks.promotion;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для повышения не настроен' });
+    roleMentions = '<@&1274110499356934211>';
+  } else if (type === 'highrank') {
+    webhookUrl = webhooks.highrank;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для высоких рангов не настроен' });
+    roleMentions = '<@&1289343511354671125>';
+  } else if (type === 'resignation') {
+    webhookUrl = webhooks.resignation;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для увольнений не настроен' });
+    roleMentions = '<@&1274110499356934211>';
   } else if (type === 'report') {
     const dept = DEPARTMENTS[department];
     if (!dept) return res.status(400).json({ error: 'Выберите корректный отдел' });
     webhookUrl = dept.webhook;
+    if (!webhookUrl) return res.status(500).json({ error: `Вебхук для "${dept.name}" не настроен` });
+    if (dept.roleId) roleMentions += `<@&${dept.roleId}> `;
+    if (dept.roleId2) roleMentions += `<@&${dept.roleId2}>`;
   } else if (type === 'transfer') {
     const deptKey = targetDepartment;
     if (!deptKey || !TRANSFER_WEBHOOKS[deptKey]) return res.status(400).json({ error: 'Некорректный отдел' });
     webhookUrl = TRANSFER_WEBHOOKS[deptKey];
-  } else if (type === 'highrank') {
-    webhookUrl = webhooks.highrank;
-  } else if (type === 'resignation') {
-    webhookUrl = webhooks.resignation;
+    if (!webhookUrl) return res.status(500).json({ error: `Вебхук для перевода в "${targetDepartment}" не настроен` });
+    const deptInfo = DEPARTMENTS[targetDepartment];
+    if (deptInfo && deptInfo.roleId) roleMentions += `<@&${deptInfo.roleId}> `;
+    if (deptInfo && deptInfo.roleId2) roleMentions += `<@&${deptInfo.roleId2}>`;
   } else {
     webhookUrl = webhooks.promotion;
+    roleMentions = '<@&1274110499356934211>';
   }
 
   const embed = {
