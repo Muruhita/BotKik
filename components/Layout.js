@@ -30,6 +30,14 @@ export default function Layout({ children }) {
 
   return (
     <div className="app-container">
+      {/* ОГРОМНЫЙ АНИМИРОВАННЫЙ ФОН */}
+      <div className="animated-bg">
+        <div className="bg-gradient"></div>
+        <div className="orb orb1"></div>
+        <div className="orb orb2"></div>
+        <div className="orb orb3"></div>
+      </div>
+
       <nav className="navbar">
         <div className="nav-logo">🏛️ FIB Forms</div>
         <div className="nav-tabs">
@@ -55,18 +63,104 @@ export default function Layout({ children }) {
           min-height: 100vh;
           background: #0a0a0a;
           color: white;
+          position: relative;
+          overflow: hidden;
         }
+
+        /* ОСНОВНОЙ ФОН */
+        .animated-bg {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          z-index: -1;
+          overflow: hidden;
+        }
+
+        .bg-gradient {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(135deg, #0a0a1a, #1a1a3e, #2d1b69, #0a0a1a);
+          background-size: 400% 400%;
+          animation: gradientMove 15s ease infinite;
+        }
+
+        /* СВЕТЯЩИЕСЯ ШАРЫ */
+        .orb {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(80px);
+          opacity: 0.4;
+          mix-blend-mode: screen; /* Заставляет светиться поверх черного */
+        }
+
+        .orb1 {
+          width: 500px;
+          height: 500px;
+          background: #5865F2;
+          top: -10%;
+          left: -10%;
+          animation: float1 12s ease-in-out infinite;
+        }
+
+        .orb2 {
+          width: 400px;
+          height: 400px;
+          background: #FF69B4;
+          bottom: -10%;
+          right: -10%;
+          animation: float2 15s ease-in-out infinite;
+        }
+
+        .orb3 {
+          width: 350px;
+          height: 350px;
+          background: #00FFAA;
+          top: 40%;
+          left: 40%;
+          opacity: 0.3;
+          animation: float3 18s ease-in-out infinite;
+        }
+
+        /* АНИМАЦИИ ШАРОВ */
+        @keyframes float1 {
+          0%, 100% { transform: translate(0, 0); }
+          25% { transform: translate(40px, -50px); }
+          50% { transform: translate(-30px, 30px); }
+          75% { transform: translate(20px, 50px); }
+        }
+
+        @keyframes float2 {
+          0%, 100% { transform: translate(0, 0); }
+          33% { transform: translate(-60px, -30px); }
+          66% { transform: translate(50px, 40px); }
+        }
+
+        @keyframes float3 {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(-40px, 50px) scale(1.2); }
+        }
+
+        @keyframes gradientMove {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        /* ===== Навбар ===== */
         .navbar {
+          position: relative;
+          z-index: 10;
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 15px 30px;
-          background: #1a1a1a;
+          background: rgba(0, 0, 0, 0.8);
           border-bottom: 1px solid #333;
-          position: sticky;
-          top: 0;
-          z-index: 100;
-          animation: slideDown 0.5s ease;
         }
         .nav-logo {
           font-size: 20px;
@@ -111,13 +205,11 @@ export default function Layout({ children }) {
           cursor: pointer;
         }
         .main-content {
+          position: relative;
+          z-index: 10;
           padding: 30px;
           max-width: 1200px;
           margin: 0 auto;
-        }
-        @keyframes slideDown {
-          from { transform: translateY(-20px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
         }
       `}</style>
     </div>
