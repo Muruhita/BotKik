@@ -5,15 +5,15 @@ export default function Dashboard() {
   const router = useRouter();
 
   const forms = [
-    { title: 'Запрос на повышение', icon: '📈', path: '/forms/promotion', desc: 'Подать запрос' },
-    { title: 'Перевод в отдел', icon: '🔄', path: '/forms/transfer', desc: 'Перевестись' },
-    { title: 'Отчёт о повышении', icon: '📋', path: '/forms/report', desc: 'Отчёт для отдела' },
-    { title: 'Отчёт на повышение (Хай Ранги)', icon: '🌟', path: '/forms/high-rank-report', desc: 'Для старшего состава' },
-    { title: 'Заявление на увольнение', icon: '🚪', path: '/forms/resignation', desc: 'Уволиться' },
-    { title: 'Восстановление', icon: '🔁', path: '/forms/reinstatement', desc: 'Вернуться в FIB' },
+    { title: 'Запрос на повышение', icon: '⬆️', path: '/forms/promotion', desc: 'Запрос на повышение по рангу' },
+    { title: 'Перевод в отдел', icon: '🔀', path: '/forms/transfer', desc: 'Перевод в другую организацию' },
+    { title: 'Отчёт на повышение', icon: '📋', path: '/forms/report', desc: 'Отчёт на повышение своего для отдела' },
+    { title: 'Отчёт на повышение (Хай Ранги)', icon: '⚜️', path: '/forms/high-rank-report', desc: 'Запросы повышения от Dep.Head и Выше.' },
+    { title: 'Заявление на увольнение', icon: '⛔', path: '/forms/resignation', desc: 'Покинуть FIB' },
+    { title: 'Восстановление', icon: '🔁', path: '/forms/reinstatement', desc: 'Восстановиться в FIB' },
     { title: 'Перевод в FIB', icon: '🏛️', path: '/forms/transfer-to-fib', desc: 'Перевестись в FIB' },
-    { title: 'Спец Вооружение', icon: '🔫', path: '/forms/weapon-request', desc: 'Запросить оружие' },
-    { title: 'Снятие ЧС', icon: '🚫', path: '/forms/withdrawal', desc: 'Снять ЧС' },
+    { title: 'Спец Вооружение', icon: '🔫', path: '/forms/weapon-request', desc: 'Запросить спец. оружие' },
+    { title: 'Снятие ЧС', icon: '🛄', path: '/forms/withdrawal', desc: 'Запрос Снять ЧС' },
   ];
 
   return (
