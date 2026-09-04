@@ -48,7 +48,10 @@ export default function Layout({ children }) {
           <button onClick={async () => { await fetch('/api/logout', { method: 'POST' }); router.push('/'); }}>Выйти</button>
         </div>
       </nav>
-      <main className="main-content">{children}</main>
+      {/* key={router.pathname} заставляет React пересоздавать main при переходе, вызывая CSS-анимацию */}
+      <main key={router.pathname} className="main-content">
+        {children}
+      </main>
 
       <style jsx>{`
         .app-container {
@@ -109,10 +112,22 @@ export default function Layout({ children }) {
           border-radius: 6px;
           cursor: pointer;
         }
+        /* Анимация появления страницы */
         .main-content {
           padding: 30px;
           max-width: 1200px;
           margin: 0 auto;
+          animation: fadeInUp 0.5s ease both;
+        }
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
       `}</style>
     </div>
