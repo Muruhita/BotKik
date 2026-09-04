@@ -21,7 +21,7 @@ export default function Dashboard() {
       <h1 className="page-title">📝 Формы</h1>
       <div className="cards-grid">
         {forms.map((form, index) => (
-          <div key={index} className="card" onClick={() => router.push(form.path)} style={{ animationDelay: `${index * 0.1}s` }}>
+          <div key={index} className="card" onClick={() => router.push(form.path)}>
             <div className="card-icon">{form.icon}</div>
             <h3>{form.title}</h3>
             <p>{form.desc}</p>
@@ -47,15 +47,13 @@ export default function Dashboard() {
           border-radius: 16px;
           padding: 30px;
           cursor: pointer;
-          transition: all 0.4s ease;
+          transition: all 0.3s ease;
           text-align: center;
-          opacity: 0;
-          animation: fadeInUp 0.6s ease forwards;
         }
         .card:hover {
-          transform: translateY(-8px) scale(1.02);
+          transform: translateY(-5px);
           border-color: #fff;
-          box-shadow: 0 15px 40px rgba(255,255,255,0.1);
+          box-shadow: 0 10px 30px rgba(255,255,255,0.1);
         }
         .card-icon {
           font-size: 48px;
@@ -69,10 +67,6 @@ export default function Dashboard() {
         .card p {
           color: #888;
           font-size: 14px;
-        }
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </Layout>
