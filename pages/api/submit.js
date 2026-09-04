@@ -100,19 +100,19 @@ export default async function handler(req, res) {
   if (type === 'withdrawal') {
     webhookUrl = webhooks.withdrawal;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для снятия ЧС не настроен' });
-    roleMentions = '<@&1274110499356934211>';
+    roleMentions = '<@&1274110499377778755>','<@&1274110499377778756>';
   } else if (type === 'reinstatement') {
     webhookUrl = webhooks.reinstatement;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для восстановления не настроен' });
-    roleMentions = '<@&1274110499356934211>';
+    roleMentions = '<@&1274110499377778755>','<@&1274110499377778756>';
   } else if (type === 'transferToFib') {
     webhookUrl = webhooks.transferToFib;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для перевода в FIB не настроен' });
-    roleMentions = '<@&1274110499356934211>';
+    roleMentions = '<@&1274110499377778755>','<@&1274110499377778756>';
   } else if (type === 'weaponRequest') {
     webhookUrl = webhooks.weaponRequest;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для спец вооружения не настроен' });
-    roleMentions = '<@&1274110499356934211>';
+    roleMentions = '<@&"1385513451077636136">';
   } else if (type === 'leave') {
     webhookUrl = webhooks.leave;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для отпуска не настроен' });
