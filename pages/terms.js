@@ -4,7 +4,7 @@ export default function Terms() {
   return (
     <Layout>
       <div className="terms-container">
-        <h1>Условия использования (Terms of Service)</h1>
+        <h1>Условия использования (Terms of Service)ДАННЫЕ "Условия Пользования" ЯВЛЯЮТСЯ ШУТОЧНЫМИ И ЧИСТО ДЛЯ КРАСИВОГО ВИДА САЙТА</h1>
         <div className="terms-content">
           <p><strong>1. Общие положения</strong></p>
           <p>1.1. Настоящие Условия использования (далее — «Условия») регулируют отношения между Оператором и Пользователями при использовании Discord-бота <strong>Kimu</strong>.</p>
