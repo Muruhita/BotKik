@@ -51,16 +51,27 @@ export default function Layout({ children }) {
           <button onClick={async () => { await fetch('/api/logout', { method: 'POST' }); router.push('/'); }}>Выйти</button>
         </div>
       </nav>
-      {/* key={router.pathname} заставляет React пересоздавать main при переходе, вызывая CSS-анимацию */}
+
       <main key={router.pathname} className="main-content">
         {children}
       </main>
+
+      {/* Футер с маленькими кнопками */}
+      <footer className="footer">
+        <a href="/terms" className="footer-link">Условия Пользования</a>
+        <span className="footer-sep">•</span>
+        <a href="/privacy" className="footer-link">Политика конфиденциальности</a>
+        <span className="footer-sep">•</span>
+        <span className="footer-author">Автор: @murkilanki</span>
+      </footer>
 
       <style jsx>{`
         .app-container {
           min-height: 100vh;
           background: #0a0a0a;
           color: white;
+          display: flex;
+          flex-direction: column;
         }
         .navbar {
           display: flex;
@@ -123,22 +134,53 @@ export default function Layout({ children }) {
           border-radius: 6px;
           cursor: pointer;
         }
-        /* Анимация появления страницы */
         .main-content {
           padding: 30px;
           max-width: 1200px;
           margin: 0 auto;
+          flex: 1;
+          width: 100%;
           animation: fadeInUp 0.5s ease both;
         }
         @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Футер */
+        .footer {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 8px;
+          padding: 15px 20px;
+          background: rgba(255, 255, 255, 0.02);
+          border-top: 1px solid rgba(255, 255, 255, 0.05);
+          font-size: 13px;
+          color: #777;
+          flex-wrap: wrap;
+        }
+        .footer-link {
+          background: transparent;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 6px;
+          padding: 4px 10px;
+          color: #aaa;
+          text-decoration: none;
+          transition: all 0.2s;
+          font-size: 12px;
+        }
+        .footer-link:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: #fff;
+          border-color: rgba(255, 255, 255, 0.3);
+        }
+        .footer-sep {
+          color: #555;
+        }
+        .footer-author {
+          color: #888;
+          font-size: 12px;
         }
       `}</style>
     </div>
