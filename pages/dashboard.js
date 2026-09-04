@@ -46,7 +46,7 @@ export default function Dashboard() {
   return (
     <div className="dashboard">
       <div className="header">
-        <h1>🏛️ Majestic FIB Forms</h1>
+        <h1>🏛️FIB Forms</h1>
         <div className="user-info">
           <img 
             src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`} 
@@ -58,7 +58,7 @@ export default function Dashboard() {
           {/* Кнопка админ-панели (видна только админам из списка) */}
           {isAdmin && (
             <button onClick={() => router.push('/admin')} className="admin-btn">
-              🛠️ Админ-панель
+              🛠️ Admin
             </button>
           )}
 
@@ -81,8 +81,8 @@ export default function Dashboard() {
 
         <div className="card" onClick={() => router.push('/forms/report')}>
           <div className="card-icon">📋</div>
-          <h3>Отчёт о повышении</h3>
-          <p>Подать отчёт о повышении для своего отдела</p>
+          <h3>Отчёт на повышении</h3>
+          <p>Подать отчёт на повышение для своего отдела</p>
         </div>
 
         <div className="card" onClick={() => router.push('/forms/high-rank-report')}>
@@ -93,7 +93,7 @@ export default function Dashboard() {
 
         <div className="card" onClick={() => router.push('/forms/resignation')}>
           <div className="card-icon">🚪</div>
-          <h3>Заявление на увольнение</h3>
+          <h3>Рапорт на увольнение</h3>
           <p>Подать заявление на увольнение из FIB</p>
         </div>
       </div>
