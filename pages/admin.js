@@ -1,98 +1,148 @@
+import Layout from '../components/Layout';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-
-// Список ID администраторов (добавь сюда второй ID)
-const ADMIN_IDS = [
-  '1018113109346504744', // Твой ID
-  '555380718566506506',
-  '260076815970729985' // ID второго админа (замени на реальный)
-];
 
 export default function AdminPanel() {
-  const router = useRouter();
+  const [bannedUsers, setBannedUsers] = useState([]);
+  const [formsActive, setFormsActive] = useState(true);
   const [userId, setUserId] = useState('');
   const [status, setStatus] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
+
+  const loadData = async () => {
+    const res = await fetch('/api/admin/list');
+    const data = await res.json();
+    setBannedUsers(data.bannedUsers || []);
+    setFormsActive(data.formsActive);
+  };
 
   useEffect(() => {
-    fetch('/api/me')
-      .then(res => res.json())
-      .then(data => {
-        // Проверяем, что это админ из списка
-        if (!data.user || !ADMIN_IDS.includes(data.user.id)) {
-          router.push('/'); // Если не админ, отправляем на главную
-          return;
-        }
-        setIsAdmin(true);
-        setLoading(false);
-      })
-      .catch(() => {
-        router.push('/');
-      });
+    loadData();
   }, []);
 
   const handleUnban = async () => {
-    if (!userId.trim()) {
-      setStatus('Введите Discord ID пользователя');
-      return;
-    }
-
+    if (!userId.trim()) return;
     const res = await fetch('/api/admin/unban', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId })
     });
     const data = await res.json();
-    setStatus(data.message || data.error || 'Ошибка');
+    setStatus(data.message || data.error);
+    loadData();
   };
 
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#0a0a1a', color: 'white' }}>
-        <p>Проверка прав...</p>
-      </div>
-    );
-  }
+  const toggleForms = async () => {
+    const res = await fetch('/api/admin/toggle-forms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: !formsActive })
+    });
+    const data = await res.json();
+    setFormsActive(data.formsActive);
+  };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0a0a1a 100%)', padding: '30px' }}>
-      <button onClick={() => router.push('/dashboard')} style={{ background: 'rgba(255, 255, 255, 0.08)', color: 'white', border: '1px solid rgba(255, 255, 255, 0.15)', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', marginBottom: '20px', fontSize: '14px' }}>
-        ← Назад в дашборд
-      </button>
-
-      <div style={{ maxWidth: '600px', margin: '0 auto', background: 'rgba(255, 255, 255, 0.03)', backdropFilter: 'blur(10px)', padding: '40px', borderRadius: '20px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-        <h1 style={{ color: 'white', marginBottom: '20px', fontSize: '28px' }}>🛠️ Админ Панель</h1>
-        <p style={{ color: '#8b8ba7', marginBottom: '30px', fontSize: '16px' }}>Введите Discord ID пользователя для снятия блокировки (антиспам или банворд).</p>
+    <Layout>
+      <div className="admin-container">
+        <h1>🛠️ Админ Панель</h1>
         
-        <input 
-          type="text" 
-          value={userId} 
-          onChange={(e) => setUserId(e.target.value)}
-          placeholder="Discord ID (например, 1018113109346504744)"
-          style={{ 
-            padding: '14px', marginBottom: '20px', width: '100%', boxSizing: 'border-box',
-            background: 'rgba(255, 255, 255, 0.05)', color: 'white', 
-            border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '10px', fontSize: '16px'
-          }}
-        />
-        
-        <button 
-          onClick={handleUnban}
-          style={{ 
-            padding: '14px 20px', background: '#4CAF50', color: 'white', 
-            border: 'none', borderRadius: '10px', cursor: 'pointer', width: '100%', fontSize: '16px', fontWeight: '600'
-          }}
-        >
-          Снять блокировку
-        </button>
-
-        {status && (
-          <p style={{ marginTop: '20px', padding: '15px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', textAlign: 'center', color: status.includes('✅') ? '#4CAF50' : '#FF4444', fontSize: '14px' }}>
-            {status}
+        <div className="section">
+          <h2>Управление заявками</h2>
+          <button onClick={toggleForms} className={formsActive ? 'stop-btn' : 'start-btn'}>
+            {formsActive ? '🚫 Остановить подачу заявок' : '✅ Возобновить подачу заявок'}
+          </button>
+          <p className="status-text">
+            Текущий статус: {formsActive ? '🟢 Прием заявок открыт' : '🔴 Прием заявок остановлен'}
           </p>
-        )}
+        </div>
+
+        <div className="section">
+          <h2>Разблокировать пользователя</h2>
+          <input type="text" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="Discord ID" />
+          <button onClick={handleUnban}>🔓 Снять блокировку</button>
+          {status && <p className="status-msg">{status}</p>}
+        </div>
+
+        <div className="section">
+          <h2>Список заблокированных</h2>
+          <div className="banned-list">
+            {bannedUsers.length === 0 ? (
+              <p>Нет заблокированных пользователей.</p>
+            ) : (
+              bannedUsers.map(user => (
+                <div key={user.userId} className="banned-item">
+                  <span>ID: {user.userId}</span>
+                  <span>Причина: {user.reason}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+
+      <style jsx>{`
+        .admin-container {
+          max-width: 800px;
+          margin: 0 auto;
+        }
+        .section {
+          background: #161616;
+          border: 1px solid #333;
+          padding: 25px;
+          border-radius: 15px;
+          margin-bottom: 25px;
+        }
+        .section h2 {
+          margin-bottom: 15px;
+          font-size: 20px;
+        }
+        input {
+          width: 100%;
+          padding: 12px;
+          background: #222;
+          border: 1px solid #444;
+          color: white;
+          border-radius: 8px;
+          margin-bottom: 10px;
+          box-sizing: border-box;
+        }
+        button {
+          padding: 12px 20px;
+          border-radius: 8px;
+          border: none;
+          cursor: pointer;
+          font-weight: bold;
+          transition: all 0.3s;
+        }
+        .stop-btn {
+          background: #ff4444;
+          color: white;
+        }
+        .start-btn {
+          background: #4CAF50;
+          color: white;
+        }
+        .status-text {
+          margin-top: 10px;
+          font-size: 14px;
+        }
+        .status-msg {
+          margin-top: 10px;
+          color: #4CAF50;
+        }
+        .banned-list {
+          max-height: 300px;
+          overflow-y: auto;
+        }
+        .banned-item {
+          background: #222;
+          padding: 10px;
+          border-radius: 8px;
+          margin-bottom: 10px;
+          display: flex;
+          justify-content: space-between;
+          font-size: 14px;
+        }
+      `}</style>
+    </Layout>
   );
 }

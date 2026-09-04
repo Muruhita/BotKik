@@ -11,7 +11,11 @@ export default async function handler(req, res) {
     const user = await getDiscordUser(tokenData.access_token);
     const jwtToken = createToken(user);
     
-    res.setHeader('Set-Cookie', `token=${jwtToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400; Secure`);
+    // Для локальной разработки убираем Secure, для продакшена оставляем
+    const isLocal = process.env.NODE_ENV === 'development';
+    const secureFlag = isLocal ? '' : '; Secure';
+    
+    res.setHeader('Set-Cookie', `token=${jwtToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400${secureFlag}`);
     res.redirect('/dashboard');
   } catch (error) {
     console.error('Auth error:', error);

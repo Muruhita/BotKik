@@ -2,7 +2,11 @@ import fs from 'fs';
 import path from 'path';
 
 const BLACKLIST_FILE = path.join(process.cwd(), 'data', 'blacklist.json');
-const ADMIN_IDS = ['1018113109346504744']; // Ваш Discord ID
+const ADMIN_IDS = [
+  '1018113109346504744', // Твой ID
+  '555380718566506506',
+  '260076815970729985' // ID второго админа (замени на реальный)
+]; // Ваш Discord ID
 
 const dataDir = path.join(process.cwd(), 'data');
 if (!fs.existsSync(dataDir)) {
