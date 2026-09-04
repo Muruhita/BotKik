@@ -11,9 +11,19 @@ export default function WeaponRequestForm() {
 
   const items = ['Дрон', 'Высокоточная винтовка (Прецизионная винтовка) ', 'Heave Sniper Mk1', 'Heave Sniper Mk2'];
 
+  const deptMap = {
+    'ib': 'IB', 'cid': 'CID', 'fa': 'FA', 'hrt': 'HRT',
+    'atf': 'ATF', 'af': 'AF', 'ocu': 'OCU', 'dea': 'DEA',
+    'fna': 'FNA', 'nsb': 'NSB', 'trainee': 'Trainee'
+  };
+
   useEffect(() => {
     fetch('/api/profile').then(res => res.json()).then(data => {
       if (data.nickname) setNickname(data.nickname);
+      if (data.department) {
+        const deptName = deptMap[data.department] || data.department;
+        setFormData(prev => ({ ...prev, department: deptName }));
+      }
     });
   }, []);
 
