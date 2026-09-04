@@ -34,7 +34,7 @@ export default function AdminPanel() {
 
   const handleUnban = async () => {
     if (!userId.trim()) {
-      setStatus('⚠️ Введите Discord ID пользователя');
+      setStatus('Введите Discord ID пользователя');
       return;
     }
 
@@ -84,7 +84,7 @@ export default function AdminPanel() {
             border: 'none', borderRadius: '10px', cursor: 'pointer', width: '100%', fontSize: '16px', fontWeight: '600'
           }}
         >
-          🔓 Снять блокировку
+          Снять блокировку
         </button>
 
         {status && (
