@@ -48,28 +48,14 @@ export default function Home() {
 
   return (
     <div className="auth-page">
-      {/* Параллакс-фон */}
-      <div className="parallax-bg">
-        {/* Слой 1: базовый градиент (медленно движется) */}
-        <div className="layer1"></div>
-        {/* Слой 2: крупные размытые круги */}
-        <div className="layer2">
-          <div className="circle circle1"></div>
-          <div className="circle circle2"></div>
-          <div className="circle circle3"></div>
-        </div>
-        {/* Слой 3: средние звёзды/частицы */}
-        <div className="layer3">
-          {[...Array(15)].map((_, i) => (
-            <span key={i} className={`star star${i + 1}`}></span>
-          ))}
-        </div>
-        {/* Слой 4: маленькие точки, двигаются быстрее */}
-        <div className="layer4">
-          {[...Array(20)].map((_, i) => (
-            <span key={i} className={`dot dot${i + 1}`}></span>
-          ))}
-        </div>
+      {/* Туман / Дымка */}
+      <div className="fog-bg">
+        {/* Три слоя тумана с разной скоростью */}
+        <div className="fog fog-1"></div>
+        <div className="fog fog-2"></div>
+        <div className="fog fog-3"></div>
+        {/* Тёмная подложка для контраста */}
+        <div className="dark-overlay"></div>
       </div>
 
       {/* Контент */}
@@ -115,8 +101,8 @@ export default function Home() {
           background: #0a0a0a;
         }
 
-        /* Параллакс-фон */
-        .parallax-bg {
+        /* Туман / Дымка */
+        .fog-bg {
           position: absolute;
           top: 0;
           left: 0;
@@ -125,148 +111,47 @@ export default function Home() {
           z-index: 0;
         }
 
-        /* Слой 1: медленный градиент */
-        .layer1 {
+        .fog {
           position: absolute;
-          inset: 0;
-          background: radial-gradient(circle at 20% 20%, #1a1a3e, #0a0a0a 60%);
-          animation: gradientShift 20s ease infinite;
+          width: 200%;
+          height: 200%;
+          background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 60%);
+          animation: fogMove 30s linear infinite;
         }
 
-        @keyframes gradientShift {
-          0%, 100% { transform: translate(0, 0); }
-          25% { transform: translate(10px, -10px); }
-          50% { transform: translate(-10px, 5px); }
-          75% { transform: translate(5px, 10px); }
+        .fog-1 {
+          top: -50%;
+          left: -50%;
+          animation-duration: 30s;
         }
 
-        /* Слой 2: крупные размытые круги */
-        .layer2 {
-          position: absolute;
-          inset: 0;
+        .fog-2 {
+          top: -20%;
+          left: -30%;
+          animation-duration: 45s;
+          animation-delay: -15s;
         }
 
-        .circle {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(50px);
-          opacity: 0.2;
-          animation: slowMove 30s linear infinite;
+        .fog-3 {
+          top: -70%;
+          left: -10%;
+          animation-duration: 60s;
+          animation-delay: -30s;
         }
 
-        .circle1 {
-          width: 300px;
-          height: 300px;
-          background: #5865F2;
-          top: 10%;
-          left: 10%;
-        }
-
-        .circle2 {
-          width: 200px;
-          height: 200px;
-          background: #FF69B4;
-          bottom: 10%;
-          right: 20%;
-          animation-duration: 25s;
-        }
-
-        .circle3 {
-          width: 150px;
-          height: 150px;
-          background: #00FFAA;
-          top: 50%;
-          left: 70%;
-          animation-duration: 35s;
-        }
-
-        @keyframes slowMove {
+        @keyframes fogMove {
           0% { transform: translate(0, 0) scale(1); }
-          25% { transform: translate(40px, -30px) scale(1.1); }
-          50% { transform: translate(-20px, 20px) scale(0.95); }
-          75% { transform: translate(20px, 40px) scale(1.05); }
+          25% { transform: translate(10%, 5%) scale(1.1); }
+          50% { transform: translate(-5%, 10%) scale(1.2); }
+          75% { transform: translate(-15%, -5%) scale(1.1); }
           100% { transform: translate(0, 0) scale(1); }
         }
 
-        /* Слой 3: средние звёзды */
-        .layer3 {
+        .dark-overlay {
           position: absolute;
           inset: 0;
+          background: rgba(0, 0, 0, 0.5);
         }
-
-        .star {
-          position: absolute;
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.8);
-          box-shadow: 0 0 10px rgba(255,255,255,0.5);
-          animation: starMove 15s linear infinite;
-        }
-
-        @keyframes starMove {
-          0% { transform: translate(0, 0); opacity: 0.5; }
-          50% { transform: translate(-30px, 20px); opacity: 1; }
-          100% { transform: translate(0, 0); opacity: 0.5; }
-        }
-
-        .star1 { top: 10%; left: 10%; animation-duration: 12s; }
-        .star2 { top: 20%; left: 80%; animation-duration: 15s; }
-        .star3 { top: 70%; left: 30%; animation-duration: 18s; }
-        .star4 { top: 50%; left: 90%; animation-duration: 14s; }
-        .star5 { top: 30%; left: 50%; animation-duration: 16s; }
-        .star6 { top: 80%; left: 60%; animation-duration: 20s; }
-        .star7 { top: 15%; left: 40%; animation-duration: 13s; }
-        .star8 { top: 60%; left: 15%; animation-duration: 17s; }
-        .star9 { top: 40%; left: 75%; animation-duration: 19s; }
-        .star10 { top: 90%; left: 20%; animation-duration: 11s; }
-        .star11 { top: 5%; left: 65%; animation-duration: 14s; }
-        .star12 { top: 45%; left: 5%; animation-duration: 16s; }
-        .star13 { top: 25%; left: 25%; animation-duration: 18s; }
-        .star14 { top: 65%; left: 85%; animation-duration: 12s; }
-        .star15 { top: 75%; left: 45%; animation-duration: 15s; }
-
-        /* Слой 4: маленькие быстрые точки */
-        .layer4 {
-          position: absolute;
-          inset: 0;
-        }
-
-        .dot {
-          position: absolute;
-          width: 3px;
-          height: 3px;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.6);
-          animation: dotMove 5s linear infinite;
-        }
-
-        @keyframes dotMove {
-          0% { transform: translate(0, 0); opacity: 0.3; }
-          50% { transform: translate(-15px, 10px); opacity: 1; }
-          100% { transform: translate(0, 0); opacity: 0.3; }
-        }
-
-        .dot1 { top: 12%; left: 15%; animation-duration: 6s; }
-        .dot2 { top: 25%; left: 85%; animation-duration: 7s; }
-        .dot3 { top: 65%; left: 35%; animation-duration: 5s; }
-        .dot4 { top: 55%; left: 95%; animation-duration: 8s; }
-        .dot5 { top: 35%; left: 55%; animation-duration: 6.5s; }
-        .dot6 { top: 85%; left: 65%; animation-duration: 7.5s; }
-        .dot7 { top: 18%; left: 45%; animation-duration: 5.5s; }
-        .dot8 { top: 60%; left: 10%; animation-duration: 6s; }
-        .dot9 { top: 45%; left: 70%; animation-duration: 7s; }
-        .dot10 { top: 92%; left: 30%; animation-duration: 5.5s; }
-        .dot11 { top: 8%; left: 55%; animation-duration: 6.5s; }
-        .dot12 { top: 40%; left: 5%; animation-duration: 7.5s; }
-        .dot13 { top: 28%; left: 20%; animation-duration: 5s; }
-        .dot14 { top: 70%; left: 80%; animation-duration: 8s; }
-        .dot15 { top: 80%; left: 50%; animation-duration: 6s; }
-        .dot16 { top: 15%; left: 70%; animation-duration: 5.5s; }
-        .dot17 { top: 50%; left: 25%; animation-duration: 7s; }
-        .dot18 { top: 75%; left: 15%; animation-duration: 6.5s; }
-        .dot19 { top: 30%; left: 90%; animation-duration: 5s; }
-        .dot20 { top: 10%; left: 30%; animation-duration: 8s; }
 
         /* Контент */
         .auth-content {
