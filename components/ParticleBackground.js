@@ -18,32 +18,26 @@ export default function ParticleBackground() {
 
     function initSketch() {
       const sketch = (p) => {
-        let isMobile = /iPhone|iPod|Android/i.test(navigator.userAgent);
         let repel_radius;
         let radius_;
         let angle = 0;
         let points = [];
-        const particles = 8000;
+        const particles = 8000; // количество частиц
         const attraction = 0.01;
         const damping = 0.9;
         const repel_strength = 28;
 
         p.setup = () => {
-          if (isMobile) {
-            p.createCanvas(360, 360);
-            radius_ = 160;
-            repel_radius = 60;
-          } else {
-            p.createCanvas(900, 700);
-            radius_ = 250;
-            repel_radius = 90;
-          }
+          // Канвас на весь экран
+          p.createCanvas(window.innerWidth, window.innerHeight);
+          // Радиус облака – 1/3 от меньшей стороны экрана
+          radius_ = Math.min(window.innerWidth, window.innerHeight) / 3;
+          repel_radius = Math.min(window.innerWidth, window.innerHeight) / 10;
 
           p.pixelDensity(1);
           p.stroke(255);
           p.strokeWeight(2);
 
-          // fill points array
           for (let i = 0; i < particles; i++) {
             points.push({
               index: i,
@@ -51,7 +45,6 @@ export default function ParticleBackground() {
               vel: p.createVector(0, 0)
             });
           }
-          // initialize at angle = 0
           angle = 0;
           updateTargets();
           for (let pt of points) pt.vel.set(0, 0);
@@ -59,6 +52,7 @@ export default function ParticleBackground() {
 
         p.draw = () => {
           p.background(0);
+          // Центрируем всё облако
           p.translate(p.width / 2, p.height / 2);
 
           let mouse = p.createVector(p.mouseX - p.width / 2, p.mouseY - p.height / 2);
@@ -66,17 +60,14 @@ export default function ParticleBackground() {
           for (let pt of points) {
             let i = pt.index;
 
-            // compute the rotating “home” position
             let homeX = p.sin(i + angle) * p.sin(i * i) * radius_;
             let homeY = p.cos(i * i) * radius_;
             let home = p.createVector(homeX, homeY);
 
-            // spring force toward home
             let toHome = p5.Vector.sub(home, pt.pos);
             let spring = toHome.mult(attraction);
             pt.vel.add(spring);
 
-            // mouse repulsion
             let awayFromMouse = p5.Vector.sub(pt.pos, mouse);
             let distSq = awayFromMouse.magSq();
             if (distSq > 0.1 && distSq < repel_radius * repel_radius) {
@@ -87,7 +78,6 @@ export default function ParticleBackground() {
               pt.vel.add(awayFromMouse);
             }
 
-            // damping and move
             pt.vel.mult(damping);
             pt.pos.add(pt.vel);
 
@@ -97,18 +87,11 @@ export default function ParticleBackground() {
         };
 
         p.windowResized = () => {
-          if (isMobile) {
-            p.resizeCanvas(360, 360);
-            radius_ = 160;
-            repel_radius = 60;
-          } else {
-            p.resizeCanvas(900, 700);
-            radius_ = 250;
-            repel_radius = 90;
-          }
+          p.resizeCanvas(window.innerWidth, window.innerHeight);
+          radius_ = Math.min(window.innerWidth, window.innerHeight) / 3;
+          repel_radius = Math.min(window.innerWidth, window.innerHeight) / 10;
         };
 
-        // put the initial positions right
         function updateTargets() {
           for (let pt of points) {
             let i = pt.index;
