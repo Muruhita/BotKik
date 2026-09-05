@@ -8,6 +8,7 @@ export default function Home() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(false);
+  const [showInfo, setShowInfo] = useState(false); // состояние для показа информации
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 100);
@@ -74,6 +75,23 @@ export default function Home() {
           Войти через Discord
         </button>
         <p className="author">Автор: @muruh1ta</p>
+
+        {/* Кнопка "Что получает бот?" */}
+        <button className="info-btn" onClick={() => setShowInfo(!showInfo)}>
+          Что получает бот?
+        </button>
+        {showInfo && (
+          <div className="info-box">
+            <p>Бот Discord при авторизации получает только:</p>
+            <ul>
+              <li>ID</li>
+              <li>@username (ваш коренной ник)</li>
+              <li>Аватар</li>
+              <li>Баннер</li>
+            </ul>
+            <p>Больше никакие данные не запрашиваются и не передаются.</p>
+          </div>
+        )}
       </div>
 
       <style jsx>{`
@@ -289,6 +307,46 @@ export default function Home() {
           margin-top: 20px;
           font-size: 14px;
           color: #888;
+        }
+
+        /* Кнопка информации */
+        .info-btn {
+          margin-top: 10px;
+          background: transparent;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: #aaa;
+          padding: 6px 12px;
+          border-radius: 8px;
+          font-size: 13px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .info-btn:hover {
+          background: rgba(255, 255, 255, 0.1);
+          border-color: white;
+          color: white;
+        }
+
+        /* Информационный блок */
+        .info-box {
+          margin-top: 10px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          border-radius: 8px;
+          padding: 10px 15px;
+          text-align: left;
+          color: #aaa;
+          font-size: 13px;
+        }
+
+        .info-box ul {
+          margin: 5px 0 5px 20px;
+          padding: 0;
+        }
+
+        .info-box li {
+          margin-bottom: 2px;
         }
       `}</style>
     </div>
