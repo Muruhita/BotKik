@@ -22,6 +22,7 @@ export default function Profile() {
   const [banned, setBanned] = useState(false);
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(true);
+  const [attemptsLeft, setAttemptsLeft] = useState(3);
 
   useEffect(() => {
     fetch('/api/profile')
@@ -42,6 +43,15 @@ export default function Profile() {
         setStatus('Ошибка загрузки профиля');
         setLoading(false);
       });
+
+    fetch('/api/spam-status')
+      .then(res => res.json())
+      .then(data => {
+        if (data.attemptsLeft !== undefined) {
+          setAttemptsLeft(data.attemptsLeft);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const saveProfile = async () => {
@@ -67,6 +77,10 @@ export default function Profile() {
             <p>Discord ID: {user.id}</p>
             <div className={`status ${banned ? 'banned' : 'active'}`}>
               {banned ? '⛔ Заблокирован' : '✅ Активен'}
+            </div>
+
+            <div className="spam-counter">
+              🕐 Доступно заявок в этом часе: <strong>{banned ? 0 : attemptsLeft}</strong>
             </div>
 
             <div className="field">
@@ -131,6 +145,18 @@ export default function Profile() {
           background: #4CAF50;
           color: white;
         }
+        .spam-counter {
+          background: rgba(88, 101, 242, 0.1);
+          border: 1px solid rgba(88, 101, 242, 0.3);
+          border-radius: 10px;
+          padding: 10px;
+          margin: 15px 0;
+          color: #aaa;
+          font-size: 14px;
+        }
+        .spam-counter strong {
+          color: white;
+        }
         .field {
           margin-bottom: 20px;
           text-align: left;
@@ -170,6 +196,11 @@ export default function Profile() {
           margin-top: 10px;
           color: #4CAF50;
           font-size: 14px;
+        }
+        .loading {
+          color: #aaa;
+          text-align: center;
+          padding: 40px;
         }
       `}</style>
     </Layout>
