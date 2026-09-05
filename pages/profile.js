@@ -65,7 +65,7 @@ export default function Profile() {
     fetchSpamStatus();
 
     // Обновление каждые 30 минут (30 * 60 * 1000 = 1800000 мс)
-    const intervalId = setInterval(fetchSpamStatus, 30 * 1000);
+    const intervalId = setInterval(fetchSpamStatus, 30 * 60 * 1000);
 
     // Очистка интервала при размонтировании
     return () => clearInterval(intervalId);
