@@ -11,6 +11,7 @@ export default function Terms() {
 
   const timerRef = useRef(null);
   const boardRef = useRef(null);
+  const scoreRef = useRef(0); // Чтобы всегда иметь актуальный счет при сохранении
 
   // Загрузка таблицы лидеров при открытии страницы
   useEffect(() => {
@@ -18,13 +19,18 @@ export default function Terms() {
   }, []);
 
   const fetchLeaderboard = async () => {
-    const res = await fetch('/api/leaderboard');
-    const data = await res.json();
-    if (data.leaderboard) setLeaderboard(data.leaderboard);
+    try {
+      const res = await fetch('/api/leaderboard');
+      const data = await res.json();
+      if (data.leaderboard) setLeaderboard(data.leaderboard);
+    } catch (error) {
+      console.error('Ошибка загрузки лидерборда:', error);
+    }
   };
 
   const startGame = () => {
     setScore(0);
+    scoreRef.current = 0; // Сбрасываем ref
     setTimeLeft(15);
     setGameState('playing');
     setShowLeaderboard(false);
@@ -32,16 +38,23 @@ export default function Terms() {
   };
 
   // Сохранение результата (вызывается и при ручном завершении, и при истечении времени)
-  const saveScore = async () => {
-    const meRes = await fetch('/api/me');
-    const meData = await meRes.json();
-    if (meData.user) {
-      await fetch('/api/leaderboard', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: meData.user.id, username: meData.user.username, score })
-      });
-      fetchLeaderboard();
+  const saveScore = async (finalScore) => {
+    try {
+      const meRes = await fetch('/api/me');
+      const meData = await meRes.json();
+      if (meData.user) {
+        const res = await fetch('/api/leaderboard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: meData.user.id, username: meData.user.username, score: finalScore })
+        });
+        if (res.ok) {
+          // Успешно сохранили - обновляем таблицу
+          await fetchLeaderboard();
+        }
+      }
+    } catch (error) {
+      console.error('Ошибка сохранения результата:', error);
     }
     setShowLeaderboard(true);
   };
@@ -49,7 +62,7 @@ export default function Terms() {
   const stopGame = () => {
     clearInterval(timerRef.current);
     setGameState('finished');
-    saveScore();
+    saveScore(scoreRef.current);
   };
 
   const moveTarget = () => {
@@ -63,7 +76,9 @@ export default function Terms() {
 
   const catchTarget = (e) => {
     e.stopPropagation();
-    setScore(prev => prev + 1);
+    const newScore = scoreRef.current + 1;
+    scoreRef.current = newScore;
+    setScore(newScore);
     setTarget(prev => ({ ...prev, visible: false }));
     setTimeout(() => {
       moveTarget();
@@ -82,8 +97,8 @@ export default function Terms() {
         if (prev <= 1) {
           clearInterval(timerRef.current);
           setGameState('finished');
-          // Здесь вызываем сохранение при естественном истечении времени
-          saveScore(); 
+          // Сохраняем результат при естественном истечении времени
+          saveScore(scoreRef.current); 
           return 0;
         }
         return prev - 1;
