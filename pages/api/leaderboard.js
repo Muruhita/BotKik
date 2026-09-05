@@ -8,7 +8,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Недостаточно данных' });
     }
 
-    // Ключ: leaderboard:score (храним JSON с именем и очками)
+    // Сохраняем в Redis ZSET (сортированный список)
     const data = JSON.stringify({ username, score, timestamp: Date.now() });
     await redis.zadd('leaderboard', score, `${userId}:${data}`);
 
