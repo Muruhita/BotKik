@@ -4,7 +4,7 @@ export default function ParticleBackground() {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    // Загружаем p5.js с CDN (если еще не загружен)
+    // Загружаем p5.js с CDN, если ещё не загружен
     if (!window.p5) {
       const script = document.createElement('script');
       script.src = 'https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js';
@@ -18,76 +18,103 @@ export default function ParticleBackground() {
 
     function initSketch() {
       const sketch = (p) => {
-        let particles = [];
-        let parNum = 800; // Количество частиц (можно уменьшить для производительности)
-        let noiseScale = 0.005; // Масштаб шума (меньше = более плавные линии)
-        let speed = 1.5; // Скорость движения частиц
+        let isMobile = /iPhone|iPod|Android/i.test(navigator.userAgent);
+        let repel_radius;
+        let radius_;
+        let angle = 0;
+        let points = [];
+        const particles = 8000;
+        const attraction = 0.01;
+        const damping = 0.9;
+        const repel_strength = 28;
 
         p.setup = () => {
-          p.createCanvas(window.innerWidth, window.innerHeight);
-          p.background(0, 0, 5); // Тёмный фон
-          
-          // Создаем частицы
-          for (let i = 0; i < parNum; i++) {
-            particles.push(new Particle());
+          if (isMobile) {
+            p.createCanvas(360, 360);
+            radius_ = 160;
+            repel_radius = 60;
+          } else {
+            p.createCanvas(900, 700);
+            radius_ = 250;
+            repel_radius = 90;
           }
+
+          p.pixelDensity(1);
+          p.stroke(255);
+          p.strokeWeight(2);
+
+          // fill points array
+          for (let i = 0; i < particles; i++) {
+            points.push({
+              index: i,
+              pos: p.createVector(0, 0),
+              vel: p.createVector(0, 0)
+            });
+          }
+          // initialize at angle = 0
+          angle = 0;
+          updateTargets();
+          for (let pt of points) pt.vel.set(0, 0);
         };
 
         p.draw = () => {
-          // Полупрозрачный слой для эффекта "шлейфа"
-          p.fill(0, 0, 5, 10);
-          p.noStroke();
-          p.rect(0, 0, p.width, p.height);
+          p.background(0);
+          p.translate(p.width / 2, p.height / 2);
 
-          for (let i = 0; i < particles.length; i++) {
-            particles[i].update();
-            particles[i].show();
+          let mouse = p.createVector(p.mouseX - p.width / 2, p.mouseY - p.height / 2);
+
+          for (let pt of points) {
+            let i = pt.index;
+
+            // compute the rotating “home” position
+            let homeX = p.sin(i + angle) * p.sin(i * i) * radius_;
+            let homeY = p.cos(i * i) * radius_;
+            let home = p.createVector(homeX, homeY);
+
+            // spring force toward home
+            let toHome = p5.Vector.sub(home, pt.pos);
+            let spring = toHome.mult(attraction);
+            pt.vel.add(spring);
+
+            // mouse repulsion
+            let awayFromMouse = p5.Vector.sub(pt.pos, mouse);
+            let distSq = awayFromMouse.magSq();
+            if (distSq > 0.1 && distSq < repel_radius * repel_radius) {
+              let distance = Math.sqrt(distSq);
+              awayFromMouse.normalize();
+              let repel = repel_strength * (1 - distance / repel_radius);
+              awayFromMouse.mult(repel);
+              pt.vel.add(awayFromMouse);
+            }
+
+            // damping and move
+            pt.vel.mult(damping);
+            pt.pos.add(pt.vel);
+
+            p.point(pt.pos.x, pt.pos.y);
           }
+          angle += 0.01;
         };
 
         p.windowResized = () => {
-          p.resizeCanvas(window.innerWidth, window.innerHeight);
+          if (isMobile) {
+            p.resizeCanvas(360, 360);
+            radius_ = 160;
+            repel_radius = 60;
+          } else {
+            p.resizeCanvas(900, 700);
+            radius_ = 250;
+            repel_radius = 90;
+          }
         };
 
-        class Particle {
-          constructor() {
-            this.x = p.random(p.width);
-            this.y = p.random(p.height);
-            // Устанавливаем начальную скорость
-            this.vx = p.random(-1, 1);
-            this.vy = p.random(-1, 1);
-            // Цвет: бирюзовый/синий
-            this.color = p.color(p.random(150, 220), p.random(50, 100), p.random(100, 150), 80);
-          }
-
-          update() {
-            // Векторное поле на основе шума Перлина
-            let angle = p.noise(this.x * noiseScale, this.y * noiseScale) * p.TWO_PI * 2;
-            this.vx += p.cos(angle) * 0.1;
-            this.vy += p.sin(angle) * 0.1;
-
-            // Ограничиваем скорость, чтобы линии были плавными
-            let speedMag = p.sqrt(this.vx * this.vx + this.vy * this.vy);
-            if (speedMag > speed) {
-              this.vx = (this.vx / speedMag) * speed;
-              this.vy = (this.vy / speedMag) * speed;
-            }
-
-            // Двигаем частицу
-            this.x += this.vx;
-            this.y += this.vy;
-
-            // Если частица ушла за экран – возвращаем её
-            if (this.x < 0) this.x = p.width;
-            if (this.x > p.width) this.x = 0;
-            if (this.y < 0) this.y = p.height;
-            if (this.y > p.height) this.y = 0;
-          }
-
-          show() {
-            p.stroke(this.color);
-            p.strokeWeight(1.5); // Толщина линии
-            p.line(this.x, this.y, this.x - this.vx, this.y - this.vy);
+        // put the initial positions right
+        function updateTargets() {
+          for (let pt of points) {
+            let i = pt.index;
+            let x = p.sin(i + angle) * p.sin(i * i) * radius_;
+            let y = p.cos(i * i) * radius_;
+            pt.pos.set(x, y);
           }
         }
       };
