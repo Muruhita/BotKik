@@ -3,15 +3,15 @@ import { useState, useEffect } from 'react';
 
 const DEPARTMENTS = [
   { id: 'ib', name: 'IB (Intelligence Branch)' },
-  { id: 'cid', name: 'CID (Criminal Investigation)' },
+  { id: 'cid', name: 'CID (Criminal Investigation Department)' },
   { id: 'fa', name: 'FA (Free Agent)' },
-  { id: 'hrt', name: 'HRT (Hostage Rescue)' },
-  { id: 'atf', name: 'ATF (Anti Terrorism)' },
+  { id: 'hrt', name: 'HRT (Hostage Rescue Team)' },
+  { id: 'atf', name: 'ATF (Anti Terrorism Force)' },
   { id: 'af', name: 'AF (Air Force)' },
-  { id: 'ocu', name: 'OCU (Organized Crime)' },
-  { id: 'dea', name: 'DEA (Drug Enforcement)' },
-  { id: 'fna', name: 'FNA (Academy)' },
-  { id: 'nsb', name: 'NSB (National Security)' },
+  { id: 'ocu', name: 'OCU (Organized Crime Unit)' },
+  { id: 'dea', name: 'DEA (Drug Enforcement Administration)' },
+  { id: 'fna', name: 'FNA (Federal National Academy)' },
+  { id: 'nsb', name: 'NSB (National Security Branch)' },
   { id: 'trainee', name: 'Trainee (Стажёр)' }
 ];
 
@@ -57,7 +57,7 @@ export default function Profile() {
         setLoading(false);
       })
       .catch(() => {
-        setStatus('Ошибка загрузки профиля');
+        setStatus('Проблема загрузки профиля');
         setLoading(false);
       });
 
@@ -86,23 +86,23 @@ export default function Profile() {
   return (
     <Layout>
       <div className="profile-container">
-        <h1>👤 Профиль</h1>
+        <h1>Ваш профиль</h1>
         {user && (
           <div className="profile-card">
             <img src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`} alt="Avatar" className="avatar" />
             <h2>{user.username}</h2>
             <p>Discord ID: {user.id}</p>
             <div className={`status ${banned ? 'banned' : 'active'}`}>
-              {banned ? '⛔ Заблокирован' : '✅ Активен'}
+              {banned ? '⛔ Заблокирован' : '✅ Нет блокировки'}
             </div>
 
             <div className="spam-counter">
-              🕐 Доступно заявок в этом часе: <strong>{banned ? 0 : attemptsLeft}</strong>
+              🕐 Доступно заявок на этот час: <strong>{banned ? 0 : attemptsLeft}</strong>
             </div>
 
             <div className="field">
               <label>Игровой ник (Имя Фамилия + Статик):</label>
-              <input type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} placeholder="Например: Sanya Suspect 270726" />
+              <input type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} placeholder="Например: Name Surname | 123456" />
             </div>
 
             <div className="field">
@@ -115,7 +115,7 @@ export default function Profile() {
               </select>
             </div>
 
-            <button onClick={saveProfile} className="save-btn">Сохранить</button>
+            <button onClick={saveProfile} className="save-btn">Сохранить данные</button>
             {status && <p className="status-msg">{status}</p>}
           </div>
         )}
