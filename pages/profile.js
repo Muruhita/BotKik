@@ -22,9 +22,26 @@ export default function Profile() {
   const [banned, setBanned] = useState(false);
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(true);
-  const [attemptsLeft, setAttemptsLeft] = useState(3);
+  const [attemptsLeft, setAttemptsLeft] = useState(3); // Начальное значение
+
+  // Функция для загрузки счётчика доступных заявок
+  const fetchSpamStatus = async () => {
+    try {
+      const res = await fetch('/api/spam-status');
+      const data = await res.json();
+      if (data.attemptsLeft !== undefined) {
+        setAttemptsLeft(data.attemptsLeft);
+      }
+      if (data.isBanned !== undefined) {
+        setBanned(data.isBanned);
+      }
+    } catch (error) {
+      console.error('Ошибка при обновлении счётчика заявок:', error);
+    }
+  };
 
   useEffect(() => {
+    // Загрузка профиля
     fetch('/api/profile')
       .then(res => res.json())
       .then(data => {
@@ -44,14 +61,14 @@ export default function Profile() {
         setLoading(false);
       });
 
-    fetch('/api/spam-status')
-      .then(res => res.json())
-      .then(data => {
-        if (data.attemptsLeft !== undefined) {
-          setAttemptsLeft(data.attemptsLeft);
-        }
-      })
-      .catch(() => {});
+    // Первичная загрузка счётчика
+    fetchSpamStatus();
+
+    // Обновление каждые 30 минут (30 * 60 * 1000 = 1800000 мс)
+    const intervalId = setInterval(fetchSpamStatus, 30 * 60 * 1000);
+
+    // Очистка интервала при размонтировании
+    return () => clearInterval(intervalId);
   }, []);
 
   const saveProfile = async () => {
