@@ -109,10 +109,10 @@ export default function Terms() {
   }, [gameState]);
 
   const getRating = (s) => {
-    if (s >= 15) return '🏆 Легенда FIB!';
-    if (s >= 10) return '🔥 Отличный агент!';
-    if (s >= 5) return '👍 Неплохо!';
-    return '🐢 Ты медленный...';
+    if (s >= 20) return '🏆 А ты силён!';
+    if (s >= 15) return '🔥 Неплохо!';
+    if (s >= 5) return '👍 Слабовато...';
+    return '🐢 Бро...';
   };
 
   return (
@@ -128,8 +128,8 @@ export default function Terms() {
         {gameState === 'playing' && (
           <div className="game-area">
             <div className="game-info">
-              <span>⏱ Осталось: {timeLeft} сек.</span>
-              <span>⭐ Очки: {score}</span>
+              <span>Времени осталось: {timeLeft} сек.</span>
+              <span>Очки: {score}</span>
             </div>
             <div ref={boardRef} className="game-board" onClick={handleBoardClick}>
               {target.visible && (
@@ -157,7 +157,7 @@ export default function Terms() {
           </button>
           {showLeaderboard && (
             <div className="leaderboard">
-              <h3>🏆 Топ игроков</h3>
+              <h3>🏆 Топ игроков по очкам</h3>
               <table>
                 <thead>
                   <tr>
