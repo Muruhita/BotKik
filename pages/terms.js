@@ -31,14 +31,8 @@ export default function Terms() {
     moveTarget();
   };
 
-  const stopGame = () => {
-    clearInterval(timerRef.current);
-    setGameState('finished');
-    saveScore();
-  };
-
+  // Сохранение результата (вызывается и при ручном завершении, и при истечении времени)
   const saveScore = async () => {
-    // Получаем данные текущего пользователя
     const meRes = await fetch('/api/me');
     const meData = await meRes.json();
     if (meData.user) {
@@ -50,6 +44,12 @@ export default function Terms() {
       fetchLeaderboard();
     }
     setShowLeaderboard(true);
+  };
+
+  const stopGame = () => {
+    clearInterval(timerRef.current);
+    setGameState('finished');
+    saveScore();
   };
 
   const moveTarget = () => {
@@ -73,18 +73,23 @@ export default function Terms() {
 
   const handleBoardClick = () => {};
 
+  // Таймер
   useEffect(() => {
     if (gameState !== 'playing') return;
+
     timerRef.current = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
           clearInterval(timerRef.current);
           setGameState('finished');
+          // Здесь вызываем сохранение при естественном истечении времени
+          saveScore(); 
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
+
     return () => clearInterval(timerRef.current);
   }, [gameState]);
 
@@ -271,7 +276,6 @@ export default function Terms() {
           margin: 0;
         }
 
-        /* Таблица лидеров */
         .leaderboard-section {
           margin-top: 30px;
           width: 100%;
