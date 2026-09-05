@@ -57,7 +57,7 @@ export default function Home() {
         <div className="logo-container">
           <img src="/logo.png" alt="FIB Logo" className="logo" />
         </div>
-        <h1 className="title" FIB Forms</h1>
+        <h1 className="title"> FIB Forms</h1>
         <p className="subtitle">Система подачи заявок FIB</p>
         <button className="discord-btn" onClick={handleDiscordLogin}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ marginRight: '10px' }}>
