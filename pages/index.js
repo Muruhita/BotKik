@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import ParticleBackground from '../components/ParticleBackground';
 
 const DISCORD_CLIENT_ID = process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || '1543995099292106772';
 const DISCORD_REDIRECT_URI = process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI || 'https://bot-kik.vercel.app/api/auth';
@@ -48,15 +49,8 @@ export default function Home() {
 
   return (
     <div className="auth-page">
-      {/* Туман / Дымка */}
-      <div className="fog-bg">
-        {/* Три слоя тумана с разной скоростью */}
-        <div className="fog fog-1"></div>
-        <div className="fog fog-2"></div>
-        <div className="fog fog-3"></div>
-        {/* Тёмная подложка для контраста */}
-        <div className="dark-overlay"></div>
-      </div>
+      {/* Фон с частицами (p5.js) */}
+      <ParticleBackground />
 
       {/* Контент */}
       <div className={`auth-content ${visible ? 'show' : ''}`}>
@@ -101,59 +95,6 @@ export default function Home() {
           background: #0a0a0a;
         }
 
-        /* Туман / Дымка */
-        .fog-bg {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          z-index: 0;
-        }
-
-        .fog {
-          position: absolute;
-          width: 200%;
-          height: 200%;
-          background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 60%);
-          animation: fogMove 30s linear infinite;
-        }
-
-        .fog-1 {
-          top: -50%;
-          left: -50%;
-          animation-duration: 30s;
-        }
-
-        .fog-2 {
-          top: -20%;
-          left: -30%;
-          animation-duration: 45s;
-          animation-delay: -15s;
-        }
-
-        .fog-3 {
-          top: -70%;
-          left: -10%;
-          animation-duration: 60s;
-          animation-delay: -30s;
-        }
-
-        @keyframes fogMove {
-          0% { transform: translate(0, 0) scale(1); }
-          25% { transform: translate(10%, 5%) scale(1.1); }
-          50% { transform: translate(-5%, 10%) scale(1.2); }
-          75% { transform: translate(-15%, -5%) scale(1.1); }
-          100% { transform: translate(0, 0) scale(1); }
-        }
-
-        .dark-overlay {
-          position: absolute;
-          inset: 0;
-          background: rgba(0, 0, 0, 0.5);
-        }
-
-        /* Контент */
         .auth-content {
           position: relative;
           z-index: 10;
