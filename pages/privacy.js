@@ -15,9 +15,9 @@ export default function Privacy() {
 
   // Данные ссылок
   const links = [
-    { label: '📊 Памятка для ФИБ (Гугл Таблица)', url: 'https://docs.google.com/spreadsheets/d/1vghv-rV-7XVEzaZMvdLv2mj73LOb3IZgHOmEFeNYe5w/edit?gid=487155581#gid=487155581' },
-    { label: '📁 sylphy (Гугл Таблица)', url: 'https://docs.google.com/spreadsheets/d/1G1wyJtcV4c2r_Oo7qvw0dl4tTBwaRy8TRONXtnCpNAE/edit?gid=0#gid=0' },
-    { label: '📋 Гугл Таблица', url: 'https://docs.google.com/spreadsheets/d/1wtOzs-zYqVBF2JhCYstLs4Cn7hLMw1YMWdppgS_L0AQ/edit?gid=0#gid=0' },
+    { label: '📊 Памятка (Гугл Таблица)', url: 'https://docs.google.com/spreadsheets/d/1vghv-rV-7XVEzaZMvdLv2mj73LOb3IZgHOmEFeNYe5w/edit?gid=487155581#gid=487155581' },
+    { label: '📁 Памятка by sylphy (Гугл Таблица)', url: 'https://docs.google.com/spreadsheets/d/1G1wyJtcV4c2r_Oo7qvw0dl4tTBwaRy8TRONXtnCpNAE/edit?gid=0#gid=0' },
+    { label: '📋 Памятка by Tamerlan (Гугл Таблица)', url: 'https://docs.google.com/spreadsheets/d/1wtOzs-zYqVBF2JhCYstLs4Cn7hLMw1YMWdppgS_L0AQ/edit?gid=0#gid=0' },
     { label: '⚖️ Форум с законами Majestic RP', url: 'https://forum.majestic-rp.ru/forums/zakonodatel-naya-baza.1017/' }
   ];
 
@@ -39,7 +39,7 @@ export default function Privacy() {
 
         {/* Контент */}
         <div className={`content ${visible ? 'show' : ''}`}>
-          <h1 className="title">🔗 Полезные ссылки</h1>
+          <h1 className="title">Может пригодиться</h1>
           <p className="subtitle">Нажмите на нужную ссылку, чтобы открыть её в новой вкладке</p>
 
           <div className="links-list">
