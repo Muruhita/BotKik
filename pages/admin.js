@@ -57,7 +57,7 @@ export default function AdminPanel() {
   return (
     <Layout>
       <div className="admin-container">
-        <h1>🛠️ Админ Панель</h1>
+        <h1>Админка</h1>
         
         <div className="section">
           <h2>Управление заявками</h2>
@@ -65,14 +65,14 @@ export default function AdminPanel() {
             {formsActive ? '🚫 Остановить подачу заявок' : '✅ Возобновить подачу заявок'}
           </button>
           <p className="status-text">
-            Текущий статус: {formsActive ? '🟢 Прием заявок открыт' : '🔴 Прием заявок остановлен'}
+            Текущий статус: {formsActive ? '🟢 Заявки открыты' : '🔴 Заявки остановлены'}
           </p>
         </div>
 
         <div className="section">
           <h2>Разблокировать пользователя</h2>
           <input type="text" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="Discord ID" />
-          <button onClick={handleUnban}>🔓 Снять блокировку</button>
+          <button onClick={handleUnban}>Снять блокировку</button>
           {status && <p className="status-msg">{status}</p>}
         </div>
 
