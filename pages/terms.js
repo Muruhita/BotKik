@@ -6,24 +6,52 @@ export default function Terms() {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(15);
   const [target, setTarget] = useState({ x: 0, y: 0, visible: true });
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+
   const timerRef = useRef(null);
   const boardRef = useRef(null);
 
-  // Запуск игры
+  // Загрузка таблицы лидеров при открытии страницы
+  useEffect(() => {
+    fetchLeaderboard();
+  }, []);
+
+  const fetchLeaderboard = async () => {
+    const res = await fetch('/api/leaderboard');
+    const data = await res.json();
+    if (data.leaderboard) setLeaderboard(data.leaderboard);
+  };
+
   const startGame = () => {
     setScore(0);
     setTimeLeft(15);
     setGameState('playing');
+    setShowLeaderboard(false);
     moveTarget();
   };
 
-  // Остановка игры
   const stopGame = () => {
     clearInterval(timerRef.current);
     setGameState('finished');
+    saveScore();
   };
 
-  // Перемещение цели в случайную позицию
+  const saveScore = async () => {
+    // Получаем данные текущего пользователя
+    const meRes = await fetch('/api/me');
+    const meData = await meRes.json();
+    if (meData.user) {
+      await fetch('/api/leaderboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: meData.user.id, username: meData.user.username, score })
+      });
+      fetchLeaderboard();
+    }
+    setShowLeaderboard(true);
+  };
+
   const moveTarget = () => {
     const board = boardRef.current;
     if (!board) return;
@@ -33,7 +61,6 @@ export default function Terms() {
     setTarget({ x, y, visible: true });
   };
 
-  // Попадание по цели
   const catchTarget = (e) => {
     e.stopPropagation();
     setScore(prev => prev + 1);
@@ -44,12 +71,8 @@ export default function Terms() {
     }, 150);
   };
 
-  // Клик по фону (мимо) — уменьшаем время?
-  const handleBoardClick = () => {
-    // Не наказываем, просто ничего
-  };
+  const handleBoardClick = () => {};
 
-  // Таймер
   useEffect(() => {
     if (gameState !== 'playing') return;
     timerRef.current = setInterval(() => {
@@ -106,11 +129,45 @@ export default function Terms() {
             <button className="start-btn" onClick={startGame}>Сыграть ещё раз</button>
           </div>
         )}
+
+        {/* Таблица лидеров */}
+        <div className="leaderboard-section">
+          <button className="toggle-leaderboard" onClick={() => setShowLeaderboard(!showLeaderboard)}>
+            {showLeaderboard ? 'Скрыть таблицу лидеров' : 'Показать таблицу лидеров'}
+          </button>
+          {showLeaderboard && (
+            <div className="leaderboard">
+              <h3>🏆 Топ игроков</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Место</th>
+                    <th>Игрок</th>
+                    <th>Очки</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {leaderboard.length === 0 ? (
+                    <tr><td colSpan="3">Пока нет результатов</td></tr>
+                  ) : (
+                    leaderboard.map((entry, index) => (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>{entry.username}</td>
+                        <td>{entry.score}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
 
       <style jsx>{`
         .game-container {
-          max-width: 600px;
+          max-width: 700px;
           margin: 0 auto;
           text-align: center;
           padding: 30px;
@@ -120,7 +177,6 @@ export default function Terms() {
           min-height: 400px;
           display: flex;
           flex-direction: column;
-          justify-content: center;
           align-items: center;
         }
         h1 {
@@ -213,6 +269,51 @@ export default function Terms() {
           color: #FFD700;
           font-size: 24px;
           margin: 0;
+        }
+
+        /* Таблица лидеров */
+        .leaderboard-section {
+          margin-top: 30px;
+          width: 100%;
+        }
+        .toggle-leaderboard {
+          background: transparent;
+          border: 1px solid #444;
+          color: #aaa;
+          padding: 10px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+        .toggle-leaderboard:hover {
+          background: #222;
+          color: white;
+        }
+        .leaderboard {
+          background: #0f0f0f;
+          border-radius: 12px;
+          padding: 20px;
+          margin-top: 15px;
+        }
+        .leaderboard h3 {
+          color: white;
+          margin-bottom: 15px;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        th, td {
+          padding: 10px;
+          border-bottom: 1px solid #333;
+          color: #aaa;
+          text-align: center;
+        }
+        th {
+          color: white;
+        }
+        tr:last-child td {
+          border-bottom: none;
         }
       `}</style>
     </Layout>
