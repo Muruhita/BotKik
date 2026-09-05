@@ -18,7 +18,7 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <h1 className="page-title">📝 Формы</h1>
+      <h1 className="page-title">Формы</h1>
       <div className="cards-grid">
         {forms.map((form, index) => (
           <div key={index} className="card" onClick={() => router.push(form.path)} style={{ animationDelay: `${index * 0.08}s` }}>
