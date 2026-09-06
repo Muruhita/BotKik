@@ -65,7 +65,7 @@ export default function PromotionForm() {
       <div className="form-page">
         <button onClick={() => router.push('/dashboard')} className="back-btn">← Назад к выбору</button>
         <div className="form-container">
-          <h1>📈 Запрос на повышение</h1>
+          <h1>⬆️ Запрос на повышение</h1>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Имя Фамилия + Статик *</label>
@@ -74,7 +74,7 @@ export default function PromotionForm() {
                 required 
                 value={formData.fullName} 
                 onChange={(e) => setFormData({...formData, fullName: e.target.value})} 
-                placeholder="Например: Sanya Suspect 270726" 
+                placeholder="Например: Name Surname 123456" 
               />
             </div>
             <div className="form-group">
