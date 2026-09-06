@@ -2,6 +2,7 @@ import { verifyToken } from '../../lib/discord';
 import { isBlacklisted, addToBlacklist } from '../../lib/blacklist';
 import { containsBadWords, findBadWord, findAllBadWords } from '../../lib/badwords';
 import { checkSpam, isFormSubmissionActive } from '../../lib/antispam';
+import redis from '../../lib/redis'; // <--- Добавлено!
 
 const DEPARTMENTS = {
   'ib': { name: 'IB (Intelligence Branch)', webhook: process.env.WEBHOOK_REPORT_IB, emoji: '🕵️', roleId: '1398200840900055071', roleId2: '1520504887497064639' },
@@ -38,7 +39,7 @@ const webhooks = {
   weaponRequest: process.env.WEBHOOK_WEAPON_REQUEST,
   leave: process.env.WEBHOOK_LEAVE,
   withdrawal: process.env.WEBHOOK_WITHDRAWAL,
-  hiring: process.env.WEBHOOK_HIRING // <--- Добавлено!
+  hiring: process.env.WEBHOOK_HIRING
 };
 
 async function sendToDiscord(webhookUrl, data, retries = 3) {
@@ -98,7 +99,7 @@ export default async function handler(req, res) {
   let roleMentions = '';
 
   // Обработка всех типов форм
-  if (type === 'hiring') { // <--- Добавлено!
+  if (type === 'hiring') {
     webhookUrl = webhooks.hiring;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для трудоустройства не настроен' });
     roleMentions = '<@&1274110499377778755>'; // Роль Deputy of Director (замени на нужную, если отличается)
@@ -166,14 +167,38 @@ export default async function handler(req, res) {
   const result = await sendToDiscord(webhookUrl, { content: roleMentions.trim() || undefined, embeds: [embed], username: 'Majestic FIB Forms', avatar_url: 'https://i.imgur.com/AfFp7pu.png' });
 
   if (result.success) {
+    // 📊 СТАТИСТИКА
+    try {
+      const now = new Date();
+      const dayKey = `stats:day:${now.toISOString().slice(0,10)}`;
+      const monthKey = `stats:month:${now.toISOString().slice(0,7)}`;
+      const weekKey = `stats:week:${getWeekKey(now)}`;
+
+      await redis.incr('stats:total');
+      await redis.incr(`stats:type:${type}`);
+      await redis.incr(dayKey); await redis.expire(dayKey, 60 * 60 * 24 * 2);
+      await redis.incr(monthKey); await redis.expire(monthKey, 60 * 60 * 24 * 60);
+      await redis.incr(weekKey); await redis.expire(weekKey, 60 * 60 * 24 * 8);
+      await redis.incr(`stats:user:${userId}`);
+    } catch (e) {
+      console.error('Ошибка статистики:', e);
+    }
+    
     res.status(200).json({ success: true });
   } else {
     res.status(500).json({ error: `Не удалось отправить заявку: ${result.error}` });
   }
 }
 
+function getWeekKey(date) {
+  const start = new Date(date.getFullYear(), 0, 1);
+  const days = Math.floor((date - start) / (24 * 60 * 60 * 1000));
+  const week = Math.ceil((days + start.getDay() + 1) / 7);
+  return `${date.getFullYear()}-W${week}`;
+}
+
 function getFormTitle(type, department, targetDepartment) {
-  if (type === 'hiring') return '📝 Трудоустройство в FIB'; // <--- Добавлено!
+  if (type === 'hiring') return '📝 Трудоустройство в FIB';
   if (type === 'withdrawal') return '🚫 Снятие ЧС';
   if (type === 'reinstatement') return '🔁 Восстановление';
   if (type === 'transferToFib') return '🏛️ Перевод в FIB';
@@ -188,7 +213,7 @@ function getFormTitle(type, department, targetDepartment) {
 
 function getFormColor(type) {
   const colors = {
-    'hiring': 0x2ECC71, // <--- Добавлено! Зеленый как на скриншоте
+    'hiring': 0x2ECC71,
     'withdrawal': 0xFF69B4,
     'reinstatement': 0x00FFFF,
     'transferToFib': 0x00BFFF,
