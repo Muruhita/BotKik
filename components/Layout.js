@@ -61,9 +61,9 @@ export default function Layout({ children }) {
       </main>
 
       <footer className="footer">
-        <a href="/terms" className="footer-link">Условия</a>
+        <a href="/terms" className="footer-link">Мини-игра</a>
         <span className="footer-sep">•</span>
-        <a href="/privacy" className="footer-link">Справка</a>
+        <a href="/privacy" className="footer-link">Полезные ссылки</a>
         <span className="footer-sep">•</span>
         <span className="footer-author">Автор: @muruh1ta</span>
       </footer>
