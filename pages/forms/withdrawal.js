@@ -29,11 +29,11 @@ export default function WithdrawalForm() {
       <div className="form-page">
         <button onClick={() => router.push('/dashboard')} className="back-btn">← Назад к выбору</button>
         <div className="form-container">
-          <h1>🚫 Снятие ЧС</h1>
+          <h1>🔑 Снятие ЧС</h1>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Имя Фамилия + Статик</label>
-              <input type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} required placeholder="Например: Sanya Suspect 270726" />
+              <input type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} required placeholder="Например: Name Surname 123456" />
             </div>
             <div className="form-group">
               <label>Причина ЧС (если известна)</label>
