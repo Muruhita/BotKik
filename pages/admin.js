@@ -156,12 +156,12 @@ export default function AdminPanel() {
 
         {/* Глобальное управление заявками */}
         <div className="section">
-          <h2>Глобальное управление заявками</h2>
+          <h2>Управление заявками</h2>
           <button onClick={toggleForms} className={formsActive ? 'stop-btn' : 'start-btn'}>
             {formsActive ? '🚫 Остановить ВСЕ заявки' : '✅ Возобновить ВСЕ заявки'}
           </button>
           <p className="status-text">
-            Текущий статус: {formsActive ? '🟢 Все заявки открыты' : '🔴 Все заявки остановлены'}
+            Текущий статус: {formsActive ? '🟢 Заявки открыты' : '🔴 Заявки остановлены'}
           </p>
         </div>
 
