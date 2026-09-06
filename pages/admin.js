@@ -32,17 +32,29 @@ export default function AdminPanel() {
   };
 
   useEffect(() => {
-    loadData();
-    loadStats();
-    fetch('/api/announcement')
-      .then(res => res.json())
-      .then(data => {
-        if (data.announcement) {
-          setAnnouncement(data.announcement);
-          setAnnouncementText(data.announcement);
-        }
-      })
-      .catch(() => {});
+    const fetchAll = () => {
+      loadData();
+      loadStats();
+      // Загружаем текущее объявление
+      fetch('/api/announcement')
+        .then(res => res.json())
+        .then(data => {
+          if (data.announcement) {
+            setAnnouncement(data.announcement);
+            setAnnouncementText(data.announcement);
+          }
+        })
+        .catch(() => {});
+    };
+
+    // Первоначальная загрузка
+    fetchAll();
+
+    // Обновление каждые 5 минут (300000 мс)
+    const intervalId = setInterval(fetchAll, 5 * 60 * 1000);
+
+    // Очистка интервала при размонтировании
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleUnban = async () => {
