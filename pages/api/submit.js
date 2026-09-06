@@ -1,7 +1,7 @@
 import { verifyToken } from '../../lib/discord';
 import { isBlacklisted, addToBlacklist } from '../../lib/blacklist';
 import { containsBadWords, findBadWord, findAllBadWords } from '../../lib/badwords';
-import { checkSpam, isFormSubmissionActive, getFormStatus } from '../../lib/antispam';
+import { checkSpam, isFormSubmissionActive } from '../../lib/antispam';
 import redis from '../../lib/redis';
 
 const DEPARTMENTS = {
@@ -74,11 +74,6 @@ export default async function handler(req, res) {
 
   const isActive = await isFormSubmissionActive();
   if (!isActive) return res.status(403).json({ error: '🚫 Подача заявок временно остановлена администрацией.' });
-
-  const formStatus = await getFormStatus(type);
-  if (!formStatus) {
-    return res.status(403).json({ error: `🚫 Форма «${type}» временно отключена администрацией.` });
-  }
 
   const banned = await isBlacklisted(user.id);
   if (banned) return res.status(403).json({ error: '⛔ Ваш доступ к системе заявок заблокирован.' });
