@@ -9,11 +9,11 @@ export default function Dashboard() {
     { title: 'Перевод в отдел', icon: '🔀', path: '/forms/transfer', desc: 'Перевод в другую организацию' },
     { title: 'Отчёт на повышение', icon: '📋', path: '/forms/report', desc: 'Отчёт на повышение своего для отдела' },
     { title: 'Отчёт на повышение (Хай Ранги)', icon: '⚜️', path: '/forms/high-rank-report', desc: 'Запросы повышения от Dep.Head и Выше.' },
-    { title: 'Рапорт на увольнение', icon: '📛', path: '/forms/resignation', desc: 'Покинуть FIB' },
-    { title: 'Восстановление', icon: '🔄', path: '/forms/reinstatement', desc: 'Восстановиться в FIB' },
+    { title: 'Рапорт на увольнение', icon: '⛔', path: '/forms/resignation', desc: 'Покинуть FIB' },
+    { title: 'Восстановление', icon: '🔁', path: '/forms/reinstatement', desc: 'Восстановиться в FIB' },
     { title: 'Перевод в FIB', icon: '🏛️', path: '/forms/transfer-to-fib', desc: 'Перевестись в FIB' },
     { title: 'Спец Вооружение', icon: '🔫', path: '/forms/weapon-request', desc: 'Запросить спец. оружие' },
-    { title: 'Снятие ЧС', icon: '🔑', path: '/forms/withdrawal', desc: 'Запрос Снять ЧС' },
+    { title: 'Снятие ЧС', icon: '🛄', path: '/forms/withdrawal', desc: 'Запрос Снять ЧС' },
   ];
 
   return (
@@ -34,7 +34,7 @@ export default function Dashboard() {
           font-size: 32px;
           margin-bottom: 30px;
           text-align: center;
-          color: var(--text);
+          color: #fff;
         }
         .cards-grid {
           display: grid;
@@ -42,13 +42,13 @@ export default function Dashboard() {
           gap: 20px;
         }
         .card {
-          background: var(--card-bg);
-          border: 1px solid var(--border);
+          background: #161616;
+          border: 1px solid #333;
           border-radius: 16px;
           padding: 30px;
           cursor: pointer;
           text-align: center;
-          opacity: 0;
+          opacity: 0; /* скрываем до начала анимации */
           animation: cardIn 0.5s ease forwards;
           transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
         }
@@ -62,15 +62,16 @@ export default function Dashboard() {
           margin-bottom: 15px;
         }
         .card h3 {
-          color: var(--text);
+          color: white;
           font-size: 18px;
           margin-bottom: 10px;
         }
         .card p {
-          color: var(--text-secondary);
+          color: #888;
           font-size: 14px;
         }
 
+        /* Каскадное появление карточек */
         @keyframes cardIn {
           from {
             opacity: 0;
