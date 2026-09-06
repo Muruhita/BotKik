@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import ParticleBackground from '../components/ParticleBackground';
+import CloudBackground from '../components/CloudBackground';
 
 const DISCORD_CLIENT_ID = process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || '1543995099292106772';
 const DISCORD_REDIRECT_URI = process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI || 'https://bot-kik.vercel.app/api/auth';
@@ -49,7 +49,8 @@ export default function Home() {
 
   return (
     <div className="auth-page">
-      <ParticleBackground />
+      {/* Правильный фон для главной — облако */}
+      <CloudBackground />
 
       <div className={`auth-content ${visible ? 'show' : ''}`}>
         <div className="logo-container">
