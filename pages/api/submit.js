@@ -1,8 +1,8 @@
 import { verifyToken } from '../../lib/discord';
 import { isBlacklisted, addToBlacklist } from '../../lib/blacklist';
 import { containsBadWords, findBadWord, findAllBadWords } from '../../lib/badwords';
-import { checkSpam, isFormSubmissionActive } from '../../lib/antispam';
-import redis from '../../lib/redis'; // <--- Добавлено!
+import { checkSpam, isFormSubmissionActive, getFormStatus } from '../../lib/antispam';
+import redis from '../../lib/redis';
 
 const DEPARTMENTS = {
   'ib': { name: 'IB (Intelligence Branch)', webhook: process.env.WEBHOOK_REPORT_IB, emoji: '🕵️', roleId: '1398200840900055071', roleId2: '1520504887497064639' },
@@ -74,6 +74,12 @@ export default async function handler(req, res) {
   const isActive = await isFormSubmissionActive();
   if (!isActive) return res.status(403).json({ error: '🚫 Подача заявок временно остановлена администрацией.' });
 
+  // НОВОЕ: Проверка статуса конкретной формы
+  const formStatus = await getFormStatus(type);
+  if (!formStatus) {
+    return res.status(403).json({ error: `🚫 Форма «${type}» временно отключена администрацией.` });
+  }
+
   const banned = await isBlacklisted(user.id);
   if (banned) return res.status(403).json({ error: '⛔ Ваш доступ к системе заявок заблокирован.' });
 
@@ -102,7 +108,7 @@ export default async function handler(req, res) {
   if (type === 'hiring') {
     webhookUrl = webhooks.hiring;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для трудоустройства не настроен' });
-    roleMentions = '<@&1274110499377778755>'; // Роль Deputy of Director (замени на нужную, если отличается)
+    roleMentions = '<@&1274110499377778755>';
   } else if (type === 'withdrawal') {
     webhookUrl = webhooks.withdrawal;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для снятия ЧС не настроен' });
