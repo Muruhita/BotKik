@@ -15,7 +15,6 @@ export default function Dashboard() {
     { title: 'Спец Вооружение', icon: '🔫', path: '/forms/weapon-request', desc: 'Запросить спец. оружие' },
     { title: 'Снятие ЧС', icon: '🔑', path: '/forms/withdrawal', desc: 'Запрос Снять ЧС' },
     { title: 'Трудоустройство', icon: '💼', path: '/forms/hiring', desc: 'Вступить в FIB' },
-    { title: 'Жалоба', icon: '⁉️', path: '/forms/claim', desc: 'Подать жалобу на игрока' },
   ];
 
   return (
