@@ -47,7 +47,7 @@ export default function HiringForm() {
       <div className="form-page">
         <button onClick={() => router.push('/dashboard')} className="back-btn">← Назад к выбору</button>
         <div className="form-container">
-          <h1>📝 Трудоустройство в FIB</h1>
+          <h1>💼 Трудоустройство в FIB</h1>
           <form onSubmit={handleSubmit}>
             
             <div className="form-group">
