@@ -7,7 +7,7 @@ export default function Dashboard() {
   const forms = [
     { title: 'Запрос на повышение', icon: '⬆️', path: '/forms/promotion', desc: 'Запрос на повышение по рангу' },
     { title: 'Перевод в отдел', icon: '🔀', path: '/forms/transfer', desc: 'Перевод в другую организацию' },
-    { title: 'Отчёт на повышение', icon: '📋', path: '/forms/report', desc: 'Отчёт на повышение своего для отдела' },
+    { title: 'Отчёт на повышение', icon: '📋', path: '/forms/report', desc: 'Отчёт на повышение в своём отделе' },
     { title: 'Отчёт на повышение (Хай Ранги)', icon: '⚜️', path: '/forms/high-rank-report', desc: 'Отчеты на повышения от Dep.Head и Выше.' },
     { title: 'Рапорт на увольнение', icon: '📛', path: '/forms/resignation', desc: 'Покинуть FIB' },
     { title: 'Восстановление', icon: '🔄', path: '/forms/reinstatement', desc: 'Восстановиться в FIB' },
