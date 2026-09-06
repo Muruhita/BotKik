@@ -17,7 +17,7 @@ export default function Hosting() {
   return (
     <Layout>
       <div className="hosting-container">
-        <h1>📤 Фотохостинги</h1>
+        <h1>Фотохостинги</h1>
         <p className="description">Список доступных сервисов для загрузки скриншотов и изображений:</p>
 
         <div className="hosts-list">
