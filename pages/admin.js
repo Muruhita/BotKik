@@ -3,39 +3,51 @@ import { useState, useEffect } from 'react';
 
 const ADMIN_IDS = ['1018113109346504744', '555380718566506506', '260076815970729985'];
 
+const FORM_NAMES = {
+  promotion: '📈 Запрос на повышение',
+  transfer: '🔄 Перевод в отдел',
+  report: '📋 Отчёт о повышении',
+  highrank: '🌟 Отчёт (Хай Ранги)',
+  resignation: '🚪 Увольнение',
+  reinstatement: '🔁 Восстановление',
+  transferToFib: '🏛️ Перевод в FIB',
+  weaponRequest: '🔫 Спец Вооружение',
+  leave: '🌴 Отпуск',
+  withdrawal: '🚫 Снятие ЧС',
+  hiring: '📝 Трудоустройство'
+};
+
 export default function AdminPanel() {
   const [bannedUsers, setBannedUsers] = useState([]);
   const [formsActive, setFormsActive] = useState(true);
+  const [formStatuses, setFormStatuses] = useState({});
   const [userId, setUserId] = useState('');
   const [status, setStatus] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [stats, setStats] = useState(null);
-
-  useEffect(() => {
-    fetch('/api/me')
-      .then(res => res.json())
-      .then(data => {
-        if (!data.user || !ADMIN_IDS.includes(data.user.id)) {
-          return;
-        }
-        setIsAdmin(true);
-        loadData();
-        loadStats();
-      });
-  }, []);
+  const [announcement, setAnnouncement] = useState('');
+  const [announcementText, setAnnouncementText] = useState('');
+  const [announcementMsg, setAnnouncementMsg] = useState('');
 
   const loadData = async () => {
     const res = await fetch('/api/admin/list');
     const data = await res.json();
     setBannedUsers(data.bannedUsers || []);
     setFormsActive(data.formsActive);
+    setFormStatuses(data.formStatuses || {});
   };
 
-  const loadStats = async () => {
-    const res = await fetch('/api/admin/stats');
-    const data = await res.json();
-    if (data.total !== undefined) setStats(data);
-  };
+  useEffect(() => {
+    loadData();
+    // Загружаем текущее объявление
+    fetch('/api/announcement')
+      .then(res => res.json())
+      .then(data => {
+        if (data.announcement) {
+          setAnnouncement(data.announcement);
+          setAnnouncementText(data.announcement);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleUnban = async () => {
     if (!userId.trim()) return;
@@ -57,64 +69,92 @@ export default function AdminPanel() {
     });
     const data = await res.json();
     setFormsActive(data.formsActive);
+    loadData();
   };
 
-  if (!isAdmin) return <p>Доступ запрещён</p>;
+  const toggleFormType = async (type, currentStatus) => {
+    const res = await fetch('/api/admin/toggle-form-type', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, status: !currentStatus })
+    });
+    const data = await res.json();
+    setFormStatuses(prev => ({ ...prev, [type]: data.status }));
+  };
+
+  const saveAnnouncement = async () => {
+    const res = await fetch('/api/announcement', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: announcementText })
+    });
+    const data = await res.json();
+    setAnnouncementMsg(data.message || data.error);
+    setAnnouncement(announcementText.trim());
+  };
+
+  const clearAnnouncement = async () => {
+    const res = await fetch('/api/announcement', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: '' })
+    });
+    const data = await res.json();
+    setAnnouncementMsg(data.message || data.error);
+    setAnnouncementText('');
+    setAnnouncement('');
+  };
 
   return (
     <Layout>
       <div className="admin-container">
         <h1>Админка</h1>
-        
-        {/* Статистика */}
+
+        {/* Секция объявления */}
         <div className="section">
-          <h2>📊 Статистика заявок</h2>
-          {stats ? (
-            <div className="stats-grid">
-              <div className="stat-card">
-                <span className="stat-value">{stats.total}</span>
-                <span className="stat-label">Всего заявок</span>
-              </div>
-              <div className="stat-card">
-                <span className="stat-value">{stats.today}</span>
-                <span className="stat-label">Сегодня</span>
-              </div>
-              <div className="stat-card">
-                <span className="stat-value">{stats.thisWeek}</span>
-                <span className="stat-label">За неделю</span>
-              </div>
-              <div className="stat-card">
-                <span className="stat-value">{stats.thisMonth}</span>
-                <span className="stat-label">За месяц</span>
-              </div>
-              <div className="stat-card">
-                <span className="stat-value">{stats.activeUsers}</span>
-                <span className="stat-label">Активных юзеров</span>
-              </div>
-            </div>
-          ) : (
-            <p>Загрузка статистики...</p>
-          )}
-          {stats && Object.keys(stats.types).length > 0 && (
-            <div className="types-stats">
-              <h3>По типам форм:</h3>
-              <ul>
-                {Object.entries(stats.types).map(([type, count]) => (
-                  <li key={type}>{type}: <strong>{count}</strong></li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <h2>📢 Глобальное уведомление</h2>
+          <textarea
+            value={announcementText}
+            onChange={(e) => setAnnouncementText(e.target.value)}
+            rows="3"
+            placeholder="Введите текст объявления (например, 'Завтра формы закрыты с 12:00 до 14:00')"
+            className="announcement-textarea"
+          />
+          <div className="announcement-actions">
+            <button onClick={saveAnnouncement} className="save-announcement-btn">💾 Сохранить</button>
+            {announcement && (
+              <button onClick={clearAnnouncement} className="clear-announcement-btn">🗑️ Удалить</button>
+            )}
+          </div>
+          {announcementMsg && <p className="announcement-msg">{announcementMsg}</p>}
+        </div>
+
+        {/* Остальные секции */}
+        <div className="section">
+          <h2>Глобальное управление заявками</h2>
+          <button onClick={toggleForms} className={formsActive ? 'stop-btn' : 'start-btn'}>
+            {formsActive ? '🚫 Остановить ВСЕ заявки' : '✅ Возобновить ВСЕ заявки'}
+          </button>
+          <p className="status-text">
+            Текущий статус: {formsActive ? '🟢 Все заявки открыты' : '🔴 Все заявки остановлены'}
+          </p>
         </div>
 
         <div className="section">
-          <h2>Управление заявками</h2>
-          <button onClick={toggleForms} className={formsActive ? 'stop-btn' : 'start-btn'}>
-            {formsActive ? '🚫 Остановить подачу заявок' : '✅ Возобновить подачу заявок'}
-          </button>
-          <p className="status-text">
-            Текущий статус: {formsActive ? '🟢 Заявки открыты' : '🔴 Заявки остановлены'}
-          </p>
+          <h2>⚙️ Управление отдельными формами</h2>
+          <div className="forms-list">
+            {Object.entries(FORM_NAMES).map(([type, name]) => (
+              <div key={type} className="form-item">
+                <span className="form-name">{name}</span>
+                <button
+                  className={formStatuses[type] === false ? 'form-off' : 'form-on'}
+                  onClick={() => toggleFormType(type, formStatuses[type] !== false)}
+                >
+                  {formStatuses[type] === false ? '🔴 Выключена' : '🟢 Включена'}
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="section">
@@ -158,48 +198,85 @@ export default function AdminPanel() {
           font-size: 20px;
           color: #fff;
         }
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-          gap: 15px;
-        }
-        .stat-card {
+
+        .announcement-textarea {
+          width: 100%;
           background: rgba(0,0,0,0.3);
-          border: 1px solid rgba(255,255,255,0.1);
-          border-radius: 10px;
-          padding: 15px;
-          text-align: center;
-        }
-        .stat-value {
-          display: block;
-          font-size: 32px;
-          font-weight: bold;
-          color: #5865F2;
-        }
-        .stat-label {
-          color: #aaa;
-          font-size: 14px;
-        }
-        .types-stats {
-          margin-top: 20px;
-        }
-        .types-stats h3 {
-          margin-bottom: 10px;
-        }
-        .types-stats ul {
-          list-style: none;
-          padding: 0;
-        }
-        .types-stats li {
-          background: rgba(255,255,255,0.05);
-          padding: 8px;
+          border: 1px solid rgba(255,255,255,0.2);
           border-radius: 8px;
-          margin-bottom: 5px;
+          color: white;
+          padding: 12px;
+          font-size: 16px;
+          resize: vertical;
+        }
+
+        .announcement-actions {
+          margin-top: 10px;
+          display: flex;
+          gap: 10px;
+        }
+        .save-announcement-btn {
+          background: #5865F2;
+          color: white;
+          border: none;
+          padding: 10px 15px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: bold;
+        }
+        .clear-announcement-btn {
+          background: #f44336;
+          color: white;
+          border: none;
+          padding: 10px 15px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: bold;
+        }
+        .announcement-msg {
+          margin-top: 10px;
+          color: #4CAF50;
+        }
+
+        .forms-list {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        .form-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: rgba(255,255,255,0.05);
+          padding: 10px 15px;
+          border-radius: 8px;
+        }
+        .form-name {
           color: #ccc;
+          font-size: 15px;
         }
-        .types-stats li strong {
+        .form-on, .form-off {
+          padding: 8px 15px;
+          border-radius: 6px;
+          border: none;
+          cursor: pointer;
+          font-weight: bold;
           color: #fff;
+          transition: all 0.2s;
         }
+        .form-on {
+          background: #4CAF50;
+        }
+        .form-on:hover {
+          background: #45a049;
+        }
+        .form-off {
+          background: #f44336;
+        }
+        .form-off:hover {
+          background: #da190b;
+        }
+
         input {
           width: 100%;
           padding: 12px;

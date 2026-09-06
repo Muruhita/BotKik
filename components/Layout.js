@@ -8,6 +8,7 @@ export default function Layout({ children }) {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [announcement, setAnnouncement] = useState('');
 
   useEffect(() => {
     fetch('/api/me')
@@ -22,6 +23,16 @@ export default function Layout({ children }) {
       });
   }, []);
 
+  // Загрузка объявления
+  useEffect(() => {
+    fetch('/api/announcement')
+      .then(res => res.json())
+      .then(data => {
+        if (data.announcement) setAnnouncement(data.announcement);
+      })
+      .catch(() => {});
+  }, []);
+
   const tabs = [
     { name: 'Формы', path: '/dashboard', icon: '📝' },
     { name: 'Профиль', path: '/profile', icon: '👤' },
@@ -32,7 +43,6 @@ export default function Layout({ children }) {
   return (
     <div className="app-container">
       <ParticleBackground />
-
       <nav className="navbar">
         <div className="nav-logo">
           <img src="/logo.png" alt="FIB Logo" className="nav-logo-img" />
@@ -55,7 +65,14 @@ export default function Layout({ children }) {
         </div>
       </nav>
 
-      <main className="main-content">
+      {/* Баннер объявления */}
+      {announcement && (
+        <div className="announcement-banner">
+          <span>📢 {announcement}</span>
+        </div>
+      )}
+
+      <main key={router.pathname} className="main-content">
         {children}
       </main>
 
@@ -75,11 +92,8 @@ export default function Layout({ children }) {
           background: #0a0a0a;
           color: white;
           position: relative;
-          display: flex;
-          flex-direction: column;
         }
 
-        /* Фон должен быть позади контента */
         .app-container > :global(.p5Canvas) {
           position: fixed !important;
           top: 0;
@@ -97,7 +111,6 @@ export default function Layout({ children }) {
           background: rgba(26, 26, 26, 0.8);
           backdrop-filter: blur(15px);
           border-bottom: 1px solid #333;
-          flex-shrink: 0;
         }
         .nav-logo {
           display: flex;
@@ -150,14 +163,26 @@ export default function Layout({ children }) {
           cursor: pointer;
         }
 
+        .announcement-banner {
+          background: rgba(255, 152, 0, 0.15);
+          border-bottom: 1px solid #FF9800;
+          color: #FFB74D;
+          padding: 12px 20px;
+          text-align: center;
+          font-weight: 500;
+          position: relative;
+          z-index: 10;
+        }
+        .announcement-banner span {
+          font-size: 15px;
+        }
+
         .main-content {
           position: relative;
           z-index: 10;
           padding: 30px;
           max-width: 1200px;
           margin: 0 auto;
-          width: 100%;
-          flex: 1; /* Занимает всё свободное место, прижимая футер вниз */
           animation: fadeInUp 0.5s ease both;
         }
 
@@ -176,7 +201,6 @@ export default function Layout({ children }) {
           padding: 15px 20px;
           background: rgba(255, 255, 255, 0.02);
           border-top: 1px solid rgba(255, 255, 255, 0.05);
-          flex-shrink: 0;
         }
         .footer-link {
           background: transparent;
