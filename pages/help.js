@@ -10,7 +10,6 @@ export default function Help() {
   const [newContent, setNewContent] = useState('');
 
   useEffect(() => {
-    // Загружаем справку
     fetch('/api/help')
       .then(res => res.json())
       .then(data => {
@@ -21,7 +20,6 @@ export default function Help() {
         setContent('Не удалось загрузить справку.');
       });
 
-    // Проверяем права администратора
     fetch('/api/me')
       .then(res => res.json())
       .then(data => {
@@ -40,17 +38,6 @@ export default function Help() {
       setContent(newContent);
       setEditMode(false);
     }
-  };
-
-  // Рендер текста с сохранением переносов строк
-  const renderContent = (text) => {
-    // Разбиваем по строкам и оборачиваем в параграфы с стилем white-space: pre-line
-    // Но проще использовать style white-space: pre-line у контейнера
-    return (
-      <div className="content-text">
-        {text}
-      </div>
-    );
   };
 
   return (
@@ -78,7 +65,10 @@ export default function Help() {
             </>
           ) : (
             <div className="view-mode">
-              {renderContent(content)}
+              {/* Самое важное: inline style whiteSpace: 'pre-line' сохраняет все переносы строк! */}
+              <div className="content-text" style={{ whiteSpace: 'pre-line', lineHeight: '1.7', fontSize: '16px', color: '#e0e0e0' }}>
+                {content}
+              </div>
               {isAdmin && (
                 <button className="edit-btn" onClick={() => setEditMode(true)}>
                   ✏️ Редактировать
@@ -125,10 +115,6 @@ export default function Help() {
         }
 
         .content-text {
-          white-space: pre-line; /* Главное: сохраняем переносы строк */
-          color: #e0e0e0;
-          font-size: 16px;
-          line-height: 1.7;
           word-break: break-word;
         }
 
