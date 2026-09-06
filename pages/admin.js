@@ -11,6 +11,7 @@ export default function AdminPanel() {
   const [announcement, setAnnouncement] = useState('');
   const [announcementText, setAnnouncementText] = useState('');
   const [announcementMsg, setAnnouncementMsg] = useState('');
+  const [stats, setStats] = useState(null); // статистика
 
   const loadData = async () => {
     const res = await fetch('/api/admin/list');
@@ -19,8 +20,15 @@ export default function AdminPanel() {
     setFormsActive(data.formsActive);
   };
 
+  const loadStats = async () => {
+    const res = await fetch('/api/admin/stats');
+    const data = await res.json();
+    if (data.total !== undefined) setStats(data);
+  };
+
   useEffect(() => {
     loadData();
+    loadStats();
     // Загружаем текущее объявление
     fetch('/api/announcement')
       .then(res => res.json())
@@ -103,6 +111,49 @@ export default function AdminPanel() {
           {announcementMsg && <p className="announcement-msg">{announcementMsg}</p>}
         </div>
 
+        {/* Статистика */}
+        <div className="section">
+          <h2>📊 Статистика заявок</h2>
+          {stats ? (
+            <>
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <span className="stat-value">{stats.total}</span>
+                  <span className="stat-label">Всего заявок</span>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-value">{stats.today}</span>
+                  <span className="stat-label">Сегодня</span>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-value">{stats.thisWeek}</span>
+                  <span className="stat-label">За неделю</span>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-value">{stats.thisMonth}</span>
+                  <span className="stat-label">За месяц</span>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-value">{stats.activeUsers}</span>
+                  <span className="stat-label">Активных юзеров</span>
+                </div>
+              </div>
+              {stats.types && Object.keys(stats.types).length > 0 && (
+                <div className="types-stats">
+                  <h3>По типам форм:</h3>
+                  <ul>
+                    {Object.entries(stats.types).map(([type, count]) => (
+                      <li key={type}>{type}: <strong>{count}</strong></li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </>
+          ) : (
+            <p>Загрузка статистики...</p>
+          )}
+        </div>
+
         {/* Глобальное управление заявками */}
         <div className="section">
           <h2>Глобальное управление заявками</h2>
@@ -168,7 +219,6 @@ export default function AdminPanel() {
           font-size: 16px;
           resize: vertical;
         }
-
         .announcement-actions {
           margin-top: 10px;
           display: flex;
@@ -195,6 +245,53 @@ export default function AdminPanel() {
         .announcement-msg {
           margin-top: 10px;
           color: #4CAF50;
+        }
+
+        /* Стили для статистики */
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          gap: 15px;
+          margin-bottom: 20px;
+        }
+        .stat-card {
+          background: rgba(0,0,0,0.3);
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 10px;
+          padding: 15px;
+          text-align: center;
+        }
+        .stat-value {
+          display: block;
+          font-size: 32px;
+          font-weight: bold;
+          color: #5865F2;
+        }
+        .stat-label {
+          color: #aaa;
+          font-size: 14px;
+        }
+        .types-stats {
+          margin-top: 15px;
+        }
+        .types-stats h3 {
+          color: #ccc;
+          font-size: 16px;
+          margin-bottom: 10px;
+        }
+        .types-stats ul {
+          list-style: none;
+          padding: 0;
+        }
+        .types-stats li {
+          background: rgba(255,255,255,0.05);
+          padding: 8px;
+          border-radius: 8px;
+          margin-bottom: 5px;
+          color: #ccc;
+        }
+        .types-stats li strong {
+          color: #fff;
         }
 
         input {
