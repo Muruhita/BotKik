@@ -5,15 +5,15 @@ export default function Dashboard() {
   const router = useRouter();
 
   const forms = [
-    { title: 'Запрос на повышение', icon: ':arrow_up:', path: '/forms/promotion', desc: 'Запрос на повышение по рангу' },
-    { title: 'Перевод в отдел', icon: ':twisted_rightwards_arrows:', path: '/forms/transfer', desc: 'Перевод в другую организацию' },
-    { title: 'Отчёт на повышение', icon: ':clipboard:', path: '/forms/report', desc: 'Отчёт на повышение своего для отдела' },
-    { title: 'Отчёт на повышение (Хай Ранги)', icon: ':fleur_de_lis:', path: '/forms/high-rank-report', desc: 'Запросы повышения от Dep.Head и Выше.' },
-    { title: 'Рапорт на увольнение', icon: ':no_entry:', path: '/forms/resignation', desc: 'Покинуть FIB' },
-    { title: 'Восстановление', icon: ':repeat:', path: '/forms/reinstatement', desc: 'Восстановиться в FIB' },
-    { title: 'Перевод в FIB', icon: ':classical_building:', path: '/forms/transfer-to-fib', desc: 'Перевестись в FIB' },
-    { title: 'Спец Вооружение', icon: ':gun:', path: '/forms/weapon-request', desc: 'Запросить спец. оружие' },
-    { title: 'Снятие ЧС', icon: ':baggage_claim:', path: '/forms/withdrawal', desc: 'Запрос Снять ЧС' },
+    { title: 'Запрос на повышение', icon: '📈', path: '/forms/promotion', desc: 'Запрос на повышение по рангу' },
+    { title: 'Перевод в отдел', icon: '🔄', path: '/forms/transfer', desc: 'Перевод в другую организацию' },
+    { title: 'Отчёт на повышение', icon: '📋', path: '/forms/report', desc: 'Отчёт на повышение своего для отдела' },
+    { title: 'Отчёт на повышение (Хай Ранги)', icon: '🌟', path: '/forms/high-rank-report', desc: 'Запросы повышения от Dep.Head и Выше.' },
+    { title: 'Рапорт на увольнение', icon: '🚪', path: '/forms/resignation', desc: 'Покинуть FIB' },
+    { title: 'Восстановление', icon: '🔁', path: '/forms/reinstatement', desc: 'Восстановиться в FIB' },
+    { title: 'Перевод в FIB', icon: '🏛️', path: '/forms/transfer-to-fib', desc: 'Перевестись в FIB' },
+    { title: 'Спец Вооружение', icon: '🔫', path: '/forms/weapon-request', desc: 'Запросить спец. оружие' },
+    { title: 'Снятие ЧС', icon: '🛡️', path: '/forms/withdrawal', desc: 'Запрос Снять ЧС' },
   ];
 
   return (
@@ -34,7 +34,7 @@ export default function Dashboard() {
           font-size: 32px;
           margin-bottom: 30px;
           text-align: center;
-          color: #fff;
+          color: var(--text);
         }
         .cards-grid {
           display: grid;
@@ -42,13 +42,13 @@ export default function Dashboard() {
           gap: 20px;
         }
         .card {
-          background: #161616;
-          border: 1px solid #333;
+          background: var(--card-bg);
+          border: 1px solid var(--border);
           border-radius: 16px;
           padding: 30px;
           cursor: pointer;
           text-align: center;
-          opacity: 0; /* скрываем до начала анимации */
+          opacity: 0;
           animation: cardIn 0.5s ease forwards;
           transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
         }
@@ -62,16 +62,15 @@ export default function Dashboard() {
           margin-bottom: 15px;
         }
         .card h3 {
-          color: white;
+          color: var(--text);
           font-size: 18px;
           margin-bottom: 10px;
         }
         .card p {
-          color: #888;
+          color: var(--text-secondary);
           font-size: 14px;
         }
 
-        /* Каскадное появление карточек */
         @keyframes cardIn {
           from {
             opacity: 0;
