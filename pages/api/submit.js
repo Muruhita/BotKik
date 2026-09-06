@@ -322,7 +322,7 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     return [
       { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
       { name: '📌 Ваш ранг', value: data.rank || 'Не указан', inline: false },
-      { name: '🏢 Ваш отдел', value: data.department || 'Не указан', inline: false },
+      { name: '🏢 Ваш отдел', value: department || 'Не указан', inline: false },
       { name: '🔫 Предмет на выбор', value: data.item || 'Не указан', inline: false },
       ...baseFields
     ];
