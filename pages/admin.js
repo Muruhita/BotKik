@@ -9,17 +9,18 @@ export default function AdminPanel() {
   const [userId, setUserId] = useState('');
   const [status, setStatus] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
     fetch('/api/me')
       .then(res => res.json())
       .then(data => {
         if (!data.user || !ADMIN_IDS.includes(data.user.id)) {
-          // Если не админ, можно редиректнуть
           return;
         }
         setIsAdmin(true);
         loadData();
+        loadStats();
       });
   }, []);
 
@@ -28,6 +29,12 @@ export default function AdminPanel() {
     const data = await res.json();
     setBannedUsers(data.bannedUsers || []);
     setFormsActive(data.formsActive);
+  };
+
+  const loadStats = async () => {
+    const res = await fetch('/api/admin/stats');
+    const data = await res.json();
+    if (data.total !== undefined) setStats(data);
   };
 
   const handleUnban = async () => {
@@ -57,8 +64,49 @@ export default function AdminPanel() {
   return (
     <Layout>
       <div className="admin-container">
-        <h1> Админка </h1>
+        <h1>Админка</h1>
         
+        {/* Статистика */}
+        <div className="section">
+          <h2>📊 Статистика заявок</h2>
+          {stats ? (
+            <div className="stats-grid">
+              <div className="stat-card">
+                <span className="stat-value">{stats.total}</span>
+                <span className="stat-label">Всего заявок</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-value">{stats.today}</span>
+                <span className="stat-label">Сегодня</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-value">{stats.thisWeek}</span>
+                <span className="stat-label">За неделю</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-value">{stats.thisMonth}</span>
+                <span className="stat-label">За месяц</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-value">{stats.activeUsers}</span>
+                <span className="stat-label">Активных юзеров</span>
+              </div>
+            </div>
+          ) : (
+            <p>Загрузка статистики...</p>
+          )}
+          {stats && Object.keys(stats.types).length > 0 && (
+            <div className="types-stats">
+              <h3>По типам форм:</h3>
+              <ul>
+                {Object.entries(stats.types).map(([type, count]) => (
+                  <li key={type}>{type}: <strong>{count}</strong></li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
         <div className="section">
           <h2>Управление заявками</h2>
           <button onClick={toggleForms} className={formsActive ? 'stop-btn' : 'start-btn'}>
@@ -70,14 +118,14 @@ export default function AdminPanel() {
         </div>
 
         <div className="section">
-          <h2> Разблокировать пользователя </h2>
+          <h2>Разблокировать пользователя</h2>
           <input type="text" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="Discord ID" />
-          <button onClick={handleUnban}> Снять блокировку </button>
+          <button onClick={handleUnban}>Снять блокировку</button>
           {status && <p className="status-msg">{status}</p>}
         </div>
 
         <div className="section">
-          <h2> Список заблокированных </h2>
+          <h2>Список заблокированных</h2>
           <div className="banned-list">
             {bannedUsers.length === 0 ? (
               <p>Нет заблокированных пользователей.</p>
@@ -95,12 +143,12 @@ export default function AdminPanel() {
 
       <style jsx>{`
         .admin-container {
-          max-width: 800px;
+          max-width: 900px;
           margin: 0 auto;
         }
         .section {
-          background: #161616;
-          border: 1px solid #333;
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.1);
           padding: 25px;
           border-radius: 15px;
           margin-bottom: 25px;
@@ -108,12 +156,55 @@ export default function AdminPanel() {
         .section h2 {
           margin-bottom: 15px;
           font-size: 20px;
+          color: #fff;
+        }
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          gap: 15px;
+        }
+        .stat-card {
+          background: rgba(0,0,0,0.3);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 10px;
+          padding: 15px;
+          text-align: center;
+        }
+        .stat-value {
+          display: block;
+          font-size: 32px;
+          font-weight: bold;
+          color: #5865F2;
+        }
+        .stat-label {
+          color: #aaa;
+          font-size: 14px;
+        }
+        .types-stats {
+          margin-top: 20px;
+        }
+        .types-stats h3 {
+          margin-bottom: 10px;
+        }
+        .types-stats ul {
+          list-style: none;
+          padding: 0;
+        }
+        .types-stats li {
+          background: rgba(255,255,255,0.05);
+          padding: 8px;
+          border-radius: 8px;
+          margin-bottom: 5px;
+          color: #ccc;
+        }
+        .types-stats li strong {
+          color: #fff;
         }
         input {
           width: 100%;
           padding: 12px;
-          background: #222;
-          border: 1px solid #444;
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.2);
           color: white;
           border-radius: 8px;
           margin-bottom: 10px;
@@ -126,6 +217,7 @@ export default function AdminPanel() {
           cursor: pointer;
           font-weight: bold;
           transition: all 0.3s;
+          margin-right: 10px;
         }
         .stop-btn {
           background: #ff4444;
@@ -137,7 +229,7 @@ export default function AdminPanel() {
         }
         .status-text {
           margin-top: 10px;
-          font-size: 14px;
+          color: #aaa;
         }
         .status-msg {
           margin-top: 10px;
@@ -148,13 +240,14 @@ export default function AdminPanel() {
           overflow-y: auto;
         }
         .banned-item {
-          background: #222;
+          background: rgba(255,255,255,0.05);
           padding: 10px;
           border-radius: 8px;
           margin-bottom: 10px;
           display: flex;
           justify-content: space-between;
           font-size: 14px;
+          color: #ccc;
         }
       `}</style>
     </Layout>
