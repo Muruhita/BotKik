@@ -4,7 +4,7 @@ export default function ParticleBackground() {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    // Загружаем p5.js с CDN, если ещё не загружен
+    // Загружаем p5.js с CDN
     if (!window.p5) {
       const script = document.createElement('script');
       script.src = 'https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js';
@@ -18,86 +18,67 @@ export default function ParticleBackground() {
 
     function initSketch() {
       const sketch = (p) => {
-        let repel_radius;
-        let radius_;
-        let angle = 0;
-        let points = [];
-        const particles = 8000; // количество частиц
-        const attraction = 0.01;
-        const damping = 0.9;
-        const repel_strength = 28;
+        let particles = [];
+        let parNum = 500; // Уменьшено для производительности
+        let noiseScale = 0.005;
+        let speed = 1.5;
 
         p.setup = () => {
-          // Канвас на весь экран
           p.createCanvas(window.innerWidth, window.innerHeight);
-          // Радиус облака – 1/3 от меньшей стороны экрана
-          radius_ = Math.min(window.innerWidth, window.innerHeight) / 3;
-          repel_radius = Math.min(window.innerWidth, window.innerHeight) / 10;
-
-          p.pixelDensity(1);
-          p.stroke(255);
-          p.strokeWeight(2);
-
-          for (let i = 0; i < particles; i++) {
-            points.push({
-              index: i,
-              pos: p.createVector(0, 0),
-              vel: p.createVector(0, 0)
-            });
+          p.background(0, 0, 5);
+          for (let i = 0; i < parNum; i++) {
+            particles.push(new Particle());
           }
-          angle = 0;
-          updateTargets();
-          for (let pt of points) pt.vel.set(0, 0);
         };
 
         p.draw = () => {
-          p.background(0);
-          // Центрируем всё облако
-          p.translate(p.width / 2, p.height / 2);
+          p.fill(0, 0, 5, 10);
+          p.noStroke();
+          p.rect(0, 0, p.width, p.height);
 
-          let mouse = p.createVector(p.mouseX - p.width / 2, p.mouseY - p.height / 2);
-
-          for (let pt of points) {
-            let i = pt.index;
-
-            let homeX = p.sin(i + angle) * p.sin(i * i) * radius_;
-            let homeY = p.cos(i * i) * radius_;
-            let home = p.createVector(homeX, homeY);
-
-            let toHome = p5.Vector.sub(home, pt.pos);
-            let spring = toHome.mult(attraction);
-            pt.vel.add(spring);
-
-            let awayFromMouse = p5.Vector.sub(pt.pos, mouse);
-            let distSq = awayFromMouse.magSq();
-            if (distSq > 0.1 && distSq < repel_radius * repel_radius) {
-              let distance = Math.sqrt(distSq);
-              awayFromMouse.normalize();
-              let repel = repel_strength * (1 - distance / repel_radius);
-              awayFromMouse.mult(repel);
-              pt.vel.add(awayFromMouse);
-            }
-
-            pt.vel.mult(damping);
-            pt.pos.add(pt.vel);
-
-            p.point(pt.pos.x, pt.pos.y);
+          for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].show();
           }
-          angle += 0.01;
         };
 
         p.windowResized = () => {
           p.resizeCanvas(window.innerWidth, window.innerHeight);
-          radius_ = Math.min(window.innerWidth, window.innerHeight) / 3;
-          repel_radius = Math.min(window.innerWidth, window.innerHeight) / 10;
         };
 
-        function updateTargets() {
-          for (let pt of points) {
-            let i = pt.index;
-            let x = p.sin(i + angle) * p.sin(i * i) * radius_;
-            let y = p.cos(i * i) * radius_;
-            pt.pos.set(x, y);
+        class Particle {
+          constructor() {
+            this.x = p.random(p.width);
+            this.y = p.random(p.height);
+            this.vx = p.random(-1, 1);
+            this.vy = p.random(-1, 1);
+            this.color = p.color(p.random(150, 220), p.random(50, 100), p.random(100, 150), 80);
+          }
+
+          update() {
+            let angle = p.noise(this.x * noiseScale, this.y * noiseScale) * p.TWO_PI * 2;
+            this.vx += p.cos(angle) * 0.1;
+            this.vy += p.sin(angle) * 0.1;
+
+            let speedMag = p.sqrt(this.vx * this.vx + this.vy * this.vy);
+            if (speedMag > speed) {
+              this.vx = (this.vx / speedMag) * speed;
+              this.vy = (this.vy / speedMag) * speed;
+            }
+
+            this.x += this.vx;
+            this.y += this.vy;
+
+            if (this.x < 0) this.x = p.width;
+            if (this.x > p.width) this.x = 0;
+            if (this.y < 0) this.y = p.height;
+            if (this.y > p.height) this.y = 0;
+          }
+
+          show() {
+            p.stroke(this.color);
+            p.strokeWeight(1.5);
+            p.line(this.x, this.y, this.x - this.vx, this.y - this.vy);
           }
         }
       };
