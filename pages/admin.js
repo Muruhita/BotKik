@@ -11,7 +11,12 @@ export default function AdminPanel() {
   const [announcement, setAnnouncement] = useState('');
   const [announcementText, setAnnouncementText] = useState('');
   const [announcementMsg, setAnnouncementMsg] = useState('');
-  const [stats, setStats] = useState(null); // статистика
+  const [stats, setStats] = useState(null);
+
+  // Для блокировки
+  const [banUserId, setBanUserId] = useState('');
+  const [banReason, setBanReason] = useState('');
+  const [banMsg, setBanMsg] = useState('');
 
   const loadData = async () => {
     const res = await fetch('/api/admin/list');
@@ -29,7 +34,6 @@ export default function AdminPanel() {
   useEffect(() => {
     loadData();
     loadStats();
-    // Загружаем текущее объявление
     fetch('/api/announcement')
       .then(res => res.json())
       .then(data => {
@@ -51,6 +55,24 @@ export default function AdminPanel() {
     const data = await res.json();
     setStatus(data.message || data.error);
     loadData();
+  };
+
+  const handleBan = async () => {
+    if (!banUserId.trim()) {
+      setBanMsg('⚠️ Введите Discord ID пользователя');
+      return;
+    }
+    const res = await fetch('/api/admin/ban', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: banUserId, reason: banReason, username: 'Админ' })
+    });
+    const data = await res.json();
+    setBanMsg(data.message || data.error);
+    loadData();
+    // Очистить поля после успешного бана
+    setBanUserId('');
+    setBanReason('');
   };
 
   const toggleForms = async () => {
@@ -165,9 +187,29 @@ export default function AdminPanel() {
           </p>
         </div>
 
-        {/* Разблокировать пользователя */}
+        {/* Блокировка пользователя */}
         <div className="section">
-          <h2>Разблокировать пользователя</h2>
+          <h2>🚫 Заблокировать пользователя</h2>
+          <input
+            type="text"
+            value={banUserId}
+            onChange={(e) => setBanUserId(e.target.value)}
+            placeholder="Discord ID пользователя"
+          />
+          <input
+            type="text"
+            value={banReason}
+            onChange={(e) => setBanReason(e.target.value)}
+            placeholder="Причина (необязательно)"
+            style={{ marginTop: '8px' }}
+          />
+          <button onClick={handleBan} className="ban-btn">Заблокировать</button>
+          {banMsg && <p className="status-msg">{banMsg}</p>}
+        </div>
+
+        {/* Разблокировка пользователя */}
+        <div className="section">
+          <h2>🔓 Разблокировать пользователя</h2>
           <input type="text" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="Discord ID" />
           <button onClick={handleUnban}>Снять блокировку</button>
           {status && <p className="status-msg">{status}</p>}
@@ -175,7 +217,7 @@ export default function AdminPanel() {
 
         {/* Список заблокированных */}
         <div className="section">
-          <h2>Список заблокированных</h2>
+          <h2>📋 Список заблокированных</h2>
           <div className="banned-list">
             {bannedUsers.length === 0 ? (
               <p>Нет заблокированных пользователей.</p>
@@ -247,7 +289,6 @@ export default function AdminPanel() {
           color: #4CAF50;
         }
 
-        /* Стили для статистики */
         .stats-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -312,6 +353,13 @@ export default function AdminPanel() {
           font-weight: bold;
           transition: all 0.3s;
           margin-right: 10px;
+        }
+        .ban-btn {
+          background: #f44336;
+          color: white;
+        }
+        .ban-btn:hover {
+          background: #d32f2f;
         }
         .stop-btn {
           background: #ff4444;
