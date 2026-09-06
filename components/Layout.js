@@ -31,9 +31,7 @@ export default function Layout({ children }) {
 
   return (
     <div className="app-container">
-      {/* Фон с линиями для остальных страниц */}
       <ParticleBackground />
-
       <nav className="navbar">
         <div className="nav-logo">
           <img src="/logo.png" alt="FIB Logo" className="nav-logo-img" />
@@ -65,6 +63,8 @@ export default function Layout({ children }) {
         <span className="footer-sep">•</span>
         <a href="/privacy" className="footer-link">Полезные ссылки</a>
         <span className="footer-sep">•</span>
+        <a href="/hosting" className="footer-link">Фотохостинги</a> {/* Добавлено */}
+        <span className="footer-sep">•</span>
         <span className="footer-author">Автор: @muruh1ta</span>
       </footer>
 
@@ -76,7 +76,6 @@ export default function Layout({ children }) {
           position: relative;
         }
 
-        /* Фон должен быть позади контента */
         .app-container > :global(.p5Canvas) {
           position: fixed !important;
           top: 0;
