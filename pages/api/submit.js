@@ -99,7 +99,6 @@ export default async function handler(req, res) {
   let webhookUrl;
   let roleMentions = '';
 
-  // Обработка всех типов форм
   if (type === 'claim') {
     webhookUrl = webhooks.claim;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для жалоб не настроен' });
@@ -172,7 +171,6 @@ export default async function handler(req, res) {
   const result = await sendToDiscord(webhookUrl, { content: roleMentions.trim() || undefined, embeds: [embed], username: 'Majestic FIB Forms', avatar_url: 'https://i.imgur.com/AfFp7pu.png' });
 
   if (result.success) {
-    // Статистика
     try {
       const now = new Date();
       const dayKey = `stats:day:${now.toISOString().slice(0,10)}`;
@@ -241,7 +239,6 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     { name: '🆔 Discord ID', value: userId, inline: true }
   ];
 
-  // ЖАЛОБА
   if (type === 'claim') {
     return [
       { name: '👤 Ваши Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
@@ -252,7 +249,6 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     ];
   }
 
-  // ТРУДОУСТРОЙСТВО
   if (type === 'hiring') {
     return [
       { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
@@ -266,7 +262,7 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     ];
   }
 
-  // ОТЧЁТ О ПОВЫШЕНИИ (КРАСИВЫЕ ПОЛЯ)
+  // ✅ ВОЗВРАЩАЕМ КРАСИВЫЕ ПОЛЯ ДЛЯ REPORT (как на 2 скрине)
   if (type === 'report') {
     const dept = DEPARTMENTS[department];
     const instructorText = data.isInstructor === 'yes' ? '✅ Да' : '❌ Нет';
@@ -281,7 +277,7 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     ];
   }
 
-  // ПЕРЕВОД В ОТДЕЛ (КРАСИВЫЕ ПОЛЯ)
+  // ✅ ВОЗВРАЩАЕМ КРАСИВЫЕ ПОЛЯ ДЛЯ TRANSFER
   if (type === 'transfer') {
     const fields = [
       { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
@@ -313,7 +309,6 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     return fields;
   }
 
-  // ОСТАЛЬНЫЕ ФОРМЫ
   if (type === 'withdrawal') {
     return [
       { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
@@ -390,6 +385,6 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     ];
   }
 
-  // Fallback (не должен использоваться для основных типов)
+  // Fallback (не должен срабатывать для report/transfer, так как они обработаны выше)
   return [...baseFields, ...Object.entries(data).map(([key, value]) => ({ name: key, value: String(value) || 'Не указано', inline: false }))];
 }
