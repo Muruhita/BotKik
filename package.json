@@ -1,6 +1,6 @@
 {
-  "name": "majestic-fib-forms",
-  "version": "0.1.0",
+  "name": "fib-forms",
+  "version": "5.2.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
