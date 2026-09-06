@@ -14,6 +14,7 @@ export default function Dashboard() {
     { title: 'Перевод в FIB', icon: '🏛️', path: '/forms/transfer-to-fib', desc: 'Перевестись в FIB' },
     { title: 'Спец Вооружение', icon: '🔫', path: '/forms/weapon-request', desc: 'Запросить спец. оружие' },
     { title: 'Снятие ЧС', icon: '🔑', path: '/forms/withdrawal', desc: 'Запрос Снять ЧС' },
+    { title: 'Трудоустройство', icon: '💼', path: '/forms/hiring', desc: 'Вступить в FIB' },
   ];
 
   return (
