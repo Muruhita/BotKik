@@ -76,6 +76,7 @@ export default function Layout({ children }) {
         {children}
       </main>
 
+      {/* Фиксированный футер */}
       <footer className="footer">
         <a href="/terms" className="footer-link">Мини-игра</a>
         <span className="footer-sep">•</span>
@@ -102,8 +103,11 @@ export default function Layout({ children }) {
         }
 
         .navbar {
-          position: relative;
-          z-index: 10;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          z-index: 100;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -164,14 +168,17 @@ export default function Layout({ children }) {
         }
 
         .announcement-banner {
+          position: fixed;
+          top: 65px; /* Высота навбара */
+          left: 0;
+          width: 100%;
           background: rgba(255, 152, 0, 0.15);
           border-bottom: 1px solid #FF9800;
           color: #FFB74D;
           padding: 12px 20px;
           text-align: center;
           font-weight: 500;
-          position: relative;
-          z-index: 10;
+          z-index: 90;
         }
         .announcement-banner span {
           font-size: 15px;
@@ -181,6 +188,8 @@ export default function Layout({ children }) {
           position: relative;
           z-index: 10;
           padding: 30px;
+          padding-top: 90px; /* Отступ под фиксированный навбар */
+          padding-bottom: 80px; /* Отступ под фиксированный футер */
           max-width: 1200px;
           margin: 0 auto;
           animation: fadeInUp 0.5s ease both;
@@ -192,15 +201,19 @@ export default function Layout({ children }) {
         }
 
         .footer {
-          position: relative;
-          z-index: 10;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          z-index: 100;
           display: flex;
           justify-content: center;
           align-items: center;
           gap: 8px;
           padding: 15px 20px;
-          background: rgba(255, 255, 255, 0.02);
-          border-top: 1px solid rgba(255, 255, 255, 0.05);
+          background: rgba(10, 10, 10, 0.9);
+          backdrop-filter: blur(10px);
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
         .footer-link {
           background: transparent;
