@@ -1,21 +1,21 @@
 import { verifyToken } from '../../lib/discord';
 import { isBlacklisted, addToBlacklist } from '../../lib/blacklist';
 import { containsBadWords, findBadWord, findAllBadWords } from '../../lib/badwords';
-import { checkSpam, isFormSubmissionActive } from '../../lib/antispam';
-import redis from '../../lib/redis'; // <--- Добавлено!
+import { checkSpam, isFormSubmissionActive, getFormStatus } from '../../lib/antispam';
+import redis from '../../lib/redis';
 
 const DEPARTMENTS = {
   'ib': { name: 'IB (Intelligence Branch)', webhook: process.env.WEBHOOK_REPORT_IB, emoji: '🕵️', roleId: '1398200840900055071', roleId2: '1520504887497064639' },
-  'cid': { name: 'CID (Criminal Investigation Department)', webhook: process.env.WEBHOOK_REPORT_CID, emoji: '🔍', roleId: '1398200760843374652', roleId2: '1520680049655676948' },
+  'cid': { name: 'CID (Criminal Investigation)', webhook: process.env.WEBHOOK_REPORT_CID, emoji: '🔍', roleId: '1398200760843374652', roleId2: '1520680049655676948' },
   'fa': { name: 'FA (Free Agent)', webhook: process.env.WEBHOOK_REPORT_FA, emoji: '🆓', roleId: '1398200891353468928', roleId2: '1520680052176715876' },
-  'hrt': { name: 'HRT (Hostage Rescue Team)', webhook: process.env.WEBHOOK_REPORT_HRT, emoji: '🛡️', roleId: '1398201557635567636', roleId2: '1520680047038435358' },
-  'atf': { name: 'ATF (Anti Terrorism Force)', webhook: process.env.WEBHOOK_REPORT_ATF, emoji: '🏹', roleId: '1520680054731051159', roleId2: '1398201048598057041' },
+  'hrt': { name: 'HRT (Hostage Rescue)', webhook: process.env.WEBHOOK_REPORT_HRT, emoji: '🛡️', roleId: '1398201557635567636', roleId2: '1520680047038435358' },
+  'atf': { name: 'ATF (Anti Terrorism)', webhook: process.env.WEBHOOK_REPORT_ATF, emoji: '💥', roleId: '1520680054731051159', roleId2: '1398201048598057041' },
   'af': { name: 'AF (Air Force)', webhook: process.env.WEBHOOK_REPORT_AF, emoji: '✈️', roleId: '1398200952602755103', roleId2: '1532529633088635041' },
-  'ocu': { name: 'OCU (Organized Crime Unit)', webhook: process.env.WEBHOOK_REPORT_OCU, emoji: '⚖️', roleId: '1520680060808331294', roleId2: '1418771091291115631' },
-  'dea': { name: 'DEA (Drug Enforcement Administration)', webhook: process.env.WEBHOOK_REPORT_DEA, emoji: '🧂', roleId: '1398201115379761283', roleId2: '1274110499356934209' },
-  'fna': { name: 'FNA (Federal National Academy)', webhook: process.env.WEBHOOK_REPORT_FNA, emoji: '📚', roleId: '1520680066445742232', roleId2: '1385530645186613311' },
-  'nsb': { name: 'NSB (National Security Branch)', webhook: process.env.WEBHOOK_REPORT_NSB, emoji: '✴️', roleId: '1520680069415174275', roleId2: '1398201167154122752' },
-  'trainee': { name: 'TR (Trainee)', webhook: process.env.WEBHOOK_REPORT_TRAINEE, emoji: '📝', roleId: '1385530645186613311', roleId2: '1520680066445742232' }
+  'ocu': { name: 'OCU (Organized Crime)', webhook: process.env.WEBHOOK_REPORT_OCU, emoji: '⚖️', roleId: '1520680060808331294', roleId2: '1418771091291115631' },
+  'dea': { name: 'DEA (Drug Enforcement)', webhook: process.env.WEBHOOK_REPORT_DEA, emoji: '💊', roleId: '1398201115379761283', roleId2: '1274110499356934209' },
+  'fna': { name: 'FNA (Academy)', webhook: process.env.WEBHOOK_REPORT_FNA, emoji: '📚', roleId: '1520680066445742232', roleId2: '1385530645186613311' },
+  'nsb': { name: 'NSB (National Security)', webhook: process.env.WEBHOOK_REPORT_NSB, emoji: '🏛️', roleId: '1520680069415174275', roleId2: '1398201167154122752' },
+  'trainee': { name: 'Trainee (Стажёр)', webhook: process.env.WEBHOOK_REPORT_TRAINEE, emoji: '📖', roleId: '1385530645186613311', roleId2: '1520680066445742232' }
 };
 
 const TRANSFER_WEBHOOKS = {
@@ -39,7 +39,8 @@ const webhooks = {
   weaponRequest: process.env.WEBHOOK_WEAPON_REQUEST,
   leave: process.env.WEBHOOK_LEAVE,
   withdrawal: process.env.WEBHOOK_WITHDRAWAL,
-  hiring: process.env.WEBHOOK_HIRING
+  hiring: process.env.WEBHOOK_HIRING,
+  claim: process.env.WEBHOOK_CLAIMFIB
 };
 
 async function sendToDiscord(webhookUrl, data, retries = 3) {
@@ -74,6 +75,11 @@ export default async function handler(req, res) {
   const isActive = await isFormSubmissionActive();
   if (!isActive) return res.status(403).json({ error: '🚫 Подача заявок временно остановлена администрацией.' });
 
+  const formStatus = await getFormStatus(type);
+  if (!formStatus) {
+    return res.status(403).json({ error: `🚫 Форма «${type}» временно отключена администрацией.` });
+  }
+
   const banned = await isBlacklisted(user.id);
   if (banned) return res.status(403).json({ error: '⛔ Ваш доступ к системе заявок заблокирован.' });
 
@@ -98,11 +104,14 @@ export default async function handler(req, res) {
   let webhookUrl;
   let roleMentions = '';
 
-  // Обработка всех типов форм
-  if (type === 'hiring') {
+  if (type === 'claim') {
+    webhookUrl = webhooks.claim;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для жалоб не настроен' });
+    roleMentions = '<@&1543898638454099979>';
+  } else if (type === 'hiring') {
     webhookUrl = webhooks.hiring;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для трудоустройства не настроен' });
-    roleMentions = '<@&1274110499377778755>'; // Роль Deputy of Director (замени на нужную, если отличается)
+    roleMentions = '<@&1274110499377778755>';
   } else if (type === 'withdrawal') {
     webhookUrl = webhooks.withdrawal;
     if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для снятия ЧС не настроен' });
@@ -167,7 +176,6 @@ export default async function handler(req, res) {
   const result = await sendToDiscord(webhookUrl, { content: roleMentions.trim() || undefined, embeds: [embed], username: 'Majestic FIB Forms', avatar_url: 'https://i.imgur.com/AfFp7pu.png' });
 
   if (result.success) {
-    // 📊 СТАТИСТИКА
     try {
       const now = new Date();
       const dayKey = `stats:day:${now.toISOString().slice(0,10)}`;
@@ -198,6 +206,7 @@ function getWeekKey(date) {
 }
 
 function getFormTitle(type, department, targetDepartment) {
+  if (type === 'claim') return '📢 Жалоба';
   if (type === 'hiring') return '📝 Трудоустройство в FIB';
   if (type === 'withdrawal') return '🚫 Снятие ЧС';
   if (type === 'reinstatement') return '🔁 Восстановление';
@@ -213,6 +222,7 @@ function getFormTitle(type, department, targetDepartment) {
 
 function getFormColor(type) {
   const colors = {
+    'claim': 0xFF0000,
     'hiring': 0x2ECC71,
     'withdrawal': 0xFF69B4,
     'reinstatement': 0x00FFFF,
@@ -234,7 +244,16 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     { name: '🆔 Discord ID', value: userId, inline: true }
   ];
 
-  // НОВАЯ ФОРМА ТРУДОУСТРОЙСТВА
+  if (type === 'claim') {
+    return [
+      { name: '👤 Ваши Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '🚨 Имя нарушителя', value: data.offenderName || 'Не указано', inline: false },
+      { name: '📎 Доказательства', value: data.proofLink || 'Не указано', inline: false },
+      { name: '📝 Причина жалобы', value: data.reason || 'Не указана', inline: false },
+      ...baseFields
+    ];
+  }
+
   if (type === 'hiring') {
     return [
       { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
@@ -248,7 +267,6 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     ];
   }
 
-  // ОСТАЛЬНЫЕ ФОРМЫ
   if (type === 'withdrawal') {
     return [
       { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
