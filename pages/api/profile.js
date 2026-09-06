@@ -13,17 +13,27 @@ export default async function handler(req, res) {
     const department = await redis.get(`department:${user.id}`);
     const profileCustom = await redis.get(`profileCustom:${user.id}`);
     const banned = await isBlacklisted(user.id);
-    return res.status(200).json({ user, nickname, department, profileCustom, banned });
+    
+    return res.status(200).json({ 
+      user, 
+      nickname, 
+      department, 
+      profileCustom, 
+      banned 
+    });
   }
 
   if (req.method === 'POST') {
     const { nickname, department, profileCustom } = req.body;
 
+    // Сохраняем ник (и заодно username + avatar для списка участников)
     if (nickname !== undefined) {
       if (!nickname || containsBadWords(nickname)) {
         return res.status(400).json({ error: 'Никнейм содержит запрещенные слова!' });
       }
       await redis.set(`nickname:${user.id}`, nickname);
+      await redis.set(`username:${user.id}`, user.username);
+      await redis.set(`avatar:${user.id}`, user.avatar || '');
     }
 
     if (department !== undefined) {
@@ -31,7 +41,6 @@ export default async function handler(req, res) {
     }
 
     if (profileCustom !== undefined) {
-      // Валидация структуры
       if (typeof profileCustom === 'object' && profileCustom !== null) {
         const { type, presetId, url } = profileCustom;
         if (type === 'preset' && presetId) {
