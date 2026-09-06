@@ -32,6 +32,7 @@ export default function Layout({ children }) {
   return (
     <div className="app-container">
       <ParticleBackground />
+
       <nav className="navbar">
         <div className="nav-logo">
           <img src="/logo.png" alt="FIB Logo" className="nav-logo-img" />
@@ -54,7 +55,7 @@ export default function Layout({ children }) {
         </div>
       </nav>
 
-      <main key={router.pathname} className="main-content">
+      <main className="main-content">
         {children}
       </main>
 
@@ -63,7 +64,7 @@ export default function Layout({ children }) {
         <span className="footer-sep">•</span>
         <a href="/privacy" className="footer-link">Полезные ссылки</a>
         <span className="footer-sep">•</span>
-        <a href="/hosting" className="footer-link">Фотохостинги</a> {/* Добавлено */}
+        <a href="/hosting" className="footer-link">Фотохостинги</a>
         <span className="footer-sep">•</span>
         <span className="footer-author">Автор: @muruh1ta</span>
       </footer>
@@ -74,8 +75,11 @@ export default function Layout({ children }) {
           background: #0a0a0a;
           color: white;
           position: relative;
+          display: flex;
+          flex-direction: column;
         }
 
+        /* Фон должен быть позади контента */
         .app-container > :global(.p5Canvas) {
           position: fixed !important;
           top: 0;
@@ -93,6 +97,7 @@ export default function Layout({ children }) {
           background: rgba(26, 26, 26, 0.8);
           backdrop-filter: blur(15px);
           border-bottom: 1px solid #333;
+          flex-shrink: 0;
         }
         .nav-logo {
           display: flex;
@@ -151,6 +156,8 @@ export default function Layout({ children }) {
           padding: 30px;
           max-width: 1200px;
           margin: 0 auto;
+          width: 100%;
+          flex: 1; /* Занимает всё свободное место, прижимая футер вниз */
           animation: fadeInUp 0.5s ease both;
         }
 
@@ -169,6 +176,7 @@ export default function Layout({ children }) {
           padding: 15px 20px;
           background: rgba(255, 255, 255, 0.02);
           border-top: 1px solid rgba(255, 255, 255, 0.05);
+          flex-shrink: 0;
         }
         .footer-link {
           background: transparent;
