@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import ParticleBackground from './ParticleBackground';
 
-const ADMIN_IDS = ['1018113109346504744', '555380718566506506', '260076815970729985'];
+const ADMIN_IDS = ['1018113109346504744', '555380718566506506', '260076815970729985', '797111731864207360'];
 
 export default function Layout({ children }) {
   const router = useRouter();
