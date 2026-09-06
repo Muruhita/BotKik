@@ -34,7 +34,7 @@ export default function Dashboard() {
           font-size: 32px;
           margin-bottom: 30px;
           text-align: center;
-          color: #fff;
+          color: var(--text);
         }
         .cards-grid {
           display: grid;
@@ -42,13 +42,13 @@ export default function Dashboard() {
           gap: 20px;
         }
         .card {
-          background: #161616;
-          border: 1px solid #333;
+          background: var(--card-bg);
+          border: 1px solid var(--border);
           border-radius: 16px;
           padding: 30px;
           cursor: pointer;
           text-align: center;
-          opacity: 0; /* скрываем до начала анимации */
+          opacity: 0;
           animation: cardIn 0.5s ease forwards;
           transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
         }
@@ -62,16 +62,15 @@ export default function Dashboard() {
           margin-bottom: 15px;
         }
         .card h3 {
-          color: white;
+          color: var(--text);
           font-size: 18px;
           margin-bottom: 10px;
         }
         .card p {
-          color: #888;
+          color: var(--text-secondary);
           font-size: 14px;
         }
 
-        /* Каскадное появление карточек */
         @keyframes cardIn {
           from {
             opacity: 0;
