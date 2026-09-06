@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import CloudBackground from '../components/CloudBackground';
+import ParticleBackground from '../components/ParticleBackground';
 
 const DISCORD_CLIENT_ID = process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID || '1543995099292106772';
 const DISCORD_REDIRECT_URI = process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI || 'https://bot-kik.vercel.app/api/auth';
@@ -29,14 +29,14 @@ export default function Home() {
       .catch(() => setLoading(false));
   }, []);
 
-  const handleDiscordLogin = () => {
-    const params = new URLSearchParams({
-      client_id: DISCORD_CLIENT_ID,
-      redirect_uri: DISCORD_REDIRECT_URI,
-      response_type: 'code',
-      scope: 'identify'
-    });
-    window.location.href = `https://discord.com/api/oauth2/authorize?${params}`;
+  const handleDiscordLogin = async () => {
+    const res = await fetch('/api/start-auth');
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Ошибка при создании ссылки авторизации');
+    }
   };
 
   if (loading) {
@@ -49,10 +49,8 @@ export default function Home() {
 
   return (
     <div className="auth-page">
-      {/* Фон с вращающимся облаком */}
-      <CloudBackground />
+      <ParticleBackground />
 
-      {/* Контент */}
       <div className={`auth-content ${visible ? 'show' : ''}`}>
         <div className="logo-container">
           <img src="/logo.png" alt="FIB Logo" className="logo" />
@@ -79,143 +77,28 @@ export default function Home() {
               <li>Аватар</li>
               <li>Баннер</li>
             </ul>
-            <p>Название бота: Kimu.</p>
             <p>Больше никакие данные не запрашиваются и не передаются.</p>
           </div>
         )}
       </div>
 
       <style jsx>{`
-        .auth-page {
-          position: relative;
-          min-height: 100vh;
-          overflow: hidden;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #0a0a0a;
-        }
-
-        .auth-content {
-          position: relative;
-          z-index: 10;
-          text-align: center;
-          padding: 40px;
-          background: rgba(255, 255, 255, 0.03);
-          backdrop-filter: blur(15px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 24px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-          opacity: 0;
-          transform: translateY(30px);
-          transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        .auth-content.show {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        .logo-container {
-          margin-bottom: 20px;
-        }
-
-        .logo {
-          width: 80px;
-          height: 80px;
-          border-radius: 50%;
-          box-shadow: 0 0 30px rgba(88, 101, 242, 0.6);
-        }
-
-        .title {
-          font-size: 36px;
-          font-weight: 800;
-          color: white;
-          margin-bottom: 8px;
-          text-shadow: 0 4px 30px rgba(88, 101, 242, 0.5);
-          animation: titleGlow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes titleGlow {
-          from { text-shadow: 0 4px 30px rgba(88, 101, 242, 0.5); }
-          to { text-shadow: 0 4px 30px rgba(255, 105, 180, 0.7); }
-        }
-
-        .subtitle {
-          font-size: 18px;
-          color: #aaa;
-          margin-bottom: 30px;
-        }
-
-        .discord-btn {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          background: #5865F2;
-          color: white;
-          padding: 15px 30px;
-          border: none;
-          border-radius: 12px;
-          font-size: 16px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 20px rgba(88, 101, 242, 0.4);
-        }
-
-        .discord-btn:hover {
-          background: #4752C4;
-          transform: translateY(-3px);
-          box-shadow: 0 8px 30px rgba(88, 101, 242, 0.6);
-        }
-
-        .discord-btn:active {
-          transform: translateY(-1px);
-        }
-
-        .author {
-          margin-top: 20px;
-          font-size: 14px;
-          color: #888;
-        }
-
-        .info-btn {
-          margin-top: 10px;
-          background: transparent;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          color: #aaa;
-          padding: 6px 12px;
-          border-radius: 8px;
-          font-size: 13px;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-
-        .info-btn:hover {
-          background: rgba(255, 255, 255, 0.1);
-          border-color: white;
-          color: white;
-        }
-
-        .info-box {
-          margin-top: 10px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          border-radius: 8px;
-          padding: 10px 15px;
-          text-align: left;
-          color: #aaa;
-          font-size: 13px;
-        }
-
-        .info-box ul {
-          margin: 5px 0 5px 20px;
-          padding: 0;
-        }
-
-        .info-box li {
-          margin-bottom: 2px;
-        }
+        .auth-page { position: relative; min-height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #0a0a0a; }
+        .auth-content { position: relative; z-index: 10; text-align: center; padding: 40px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .auth-content.show { opacity: 1; transform: translateY(0); }
+        .logo-container { margin-bottom: 20px; }
+        .logo { width: 80px; height: 80px; border-radius: 50%; box-shadow: 0 0 30px rgba(88, 101, 242, 0.6); }
+        .title { font-size: 36px; font-weight: 800; color: white; margin-bottom: 8px; text-shadow: 0 4px 30px rgba(88, 101, 242, 0.5); animation: titleGlow 2s ease-in-out infinite alternate; }
+        @keyframes titleGlow { from { text-shadow: 0 4px 30px rgba(88, 101, 242, 0.5); } to { text-shadow: 0 4px 30px rgba(255, 105, 180, 0.7); } }
+        .subtitle { font-size: 18px; color: #aaa; margin-bottom: 30px; }
+        .discord-btn { display: inline-flex; align-items: center; justify-content: center; background: #5865F2; color: white; padding: 15px 30px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(88, 101, 242, 0.4); }
+        .discord-btn:hover { background: #4752C4; transform: translateY(-3px); box-shadow: 0 8px 30px rgba(88, 101, 242, 0.6); }
+        .author { margin-top: 20px; font-size: 14px; color: #888; }
+        .info-btn { margin-top: 10px; background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: #aaa; padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+        .info-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: white; color: white; }
+        .info-box { margin-top: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; padding: 10px 15px; text-align: left; color: #aaa; font-size: 13px; }
+        .info-box ul { margin: 5px 0 5px 20px; padding: 0; }
+        .info-box li { margin-bottom: 2px; }
       `}</style>
     </div>
   );
