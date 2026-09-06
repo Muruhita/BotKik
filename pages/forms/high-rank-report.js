@@ -67,7 +67,7 @@ export default function HighRankReportForm() {
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Имя Фамилия + Статик *</label>
-              <input type="text" required value={formData.fullName} onChange={(e) => setFormData({...formData, fullName: e.target.value})} placeholder="Например: Sanya Suspect 270726" />
+              <input type="text" required value={formData.fullName} onChange={(e) => setFormData({...formData, fullName: e.target.value})} placeholder="Например: Name Surname 123456" />
             </div>
             <div className="form-group">
               <label>С какого на какой ранг вы повышаетесь *</label>
