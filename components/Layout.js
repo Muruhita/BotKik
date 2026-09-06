@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import ParticleBackground from './ParticleBackground';
 
 const ADMIN_IDS = ['1018113109346504744', '555380718566506506', '260076815970729985'];
 
@@ -30,6 +31,9 @@ export default function Layout({ children }) {
 
   return (
     <div className="app-container">
+      {/* Фон с линиями для остальных страниц */}
+      <ParticleBackground />
+
       <nav className="navbar">
         <div className="nav-logo">
           <img src="/logo.png" alt="FIB Logo" className="nav-logo-img" />
@@ -56,14 +60,10 @@ export default function Layout({ children }) {
         {children}
       </main>
 
-      {/* Маленькая аниме-картинка снизу справа */}
-      <img src="/fumo.png" alt="Fumo" className="fumo-bg" />
-
-      {/* Футер с маленькими кнопками */}
       <footer className="footer">
-        <a href="/terms" className="footer-link">Мини-Игра</a>
+        <a href="/terms" className="footer-link">Условия</a>
         <span className="footer-sep">•</span>
-        <a href="/privacy" className="footer-link">Полезные ссылки</a>
+        <a href="/privacy" className="footer-link">Справка</a>
         <span className="footer-sep">•</span>
         <span className="footer-author">Автор: @muruh1ta</span>
       </footer>
@@ -73,21 +73,27 @@ export default function Layout({ children }) {
           min-height: 100vh;
           background: #0a0a0a;
           color: white;
-          display: flex;
-          flex-direction: column;
           position: relative;
-          overflow: hidden;
         }
+
+        /* Фон должен быть позади контента */
+        .app-container > :global(.p5Canvas) {
+          position: fixed !important;
+          top: 0;
+          left: 0;
+          z-index: 0;
+        }
+
         .navbar {
+          position: relative;
+          z-index: 10;
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 15px 30px;
-          background: #1a1a1a;
+          background: rgba(26, 26, 26, 0.8);
+          backdrop-filter: blur(15px);
           border-bottom: 1px solid #333;
-          position: sticky;
-          top: 0;
-          z-index: 100;
         }
         .nav-logo {
           display: flex;
@@ -139,35 +145,24 @@ export default function Layout({ children }) {
           border-radius: 6px;
           cursor: pointer;
         }
+
         .main-content {
+          position: relative;
+          z-index: 10;
           padding: 30px;
           max-width: 1200px;
           margin: 0 auto;
-          flex: 1;
-          width: 100%;
           animation: fadeInUp 0.5s ease both;
         }
+
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Маленькая аниме-картинка снизу справа */
-        .fumo-bg {
-          position: fixed;
-          bottom: 20px;
-          right: 20px;
-          width: 70px;
-          height: auto;
-          opacity: 0.15; /* Делаем почти прозрачной, чтобы не мешала */
-          pointer-events: none; /* Клики проходят сквозь неё */
-          z-index: 5; /* Над фоном, но под контентом */
-          user-select: none;
-          -webkit-user-drag: none;
-        }
-
-        /* Футер */
         .footer {
+          position: relative;
+          z-index: 10;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -175,11 +170,6 @@ export default function Layout({ children }) {
           padding: 15px 20px;
           background: rgba(255, 255, 255, 0.02);
           border-top: 1px solid rgba(255, 255, 255, 0.05);
-          font-size: 13px;
-          color: #777;
-          flex-wrap: wrap;
-          z-index: 10;
-          position: relative;
         }
         .footer-link {
           background: transparent;
