@@ -11,7 +11,7 @@ const DEPARTMENTS = {
   'atf': { name: 'ATF (Anti Terrorism)', webhook: process.env.WEBHOOK_REPORT_ATF, emoji: '💥', roleId: '1520680054731051159', roleId2: '1398201048598057041' },
   'af': { name: 'AF (Air Force)', webhook: process.env.WEBHOOK_REPORT_AF, emoji: '✈️', roleId: '1398200952602755103', roleId2: '1532529633088635041' },
   'ocu': { name: 'OCU (Organized Crime)', webhook: process.env.WEBHOOK_REPORT_OCU, emoji: '⚖️', roleId: '1520680060808331294', roleId2: '1418771091291115631' },
-  'dea': { name: 'DEA (Drug Enforcement)', webhook: process.env.WEBHOOK_REPORT_DEA, emoji: '💊', roleId: '1398201115379761283', roleId2: '1520680063614586963' },
+  'dea': { name: 'DEA (Drug Enforcement)', webhook: process.env.WEBHOOK_REPORT_DEA, emoji: '💊', roleId: '1398201115379761283', roleId2: '1274110499356934209' },
   'fna': { name: 'FNA (Academy)', webhook: process.env.WEBHOOK_REPORT_FNA, emoji: '📚', roleId: '1520680066445742232', roleId2: '1385530645186613311' },
   'nsb': { name: 'NSB (National Security)', webhook: process.env.WEBHOOK_REPORT_NSB, emoji: '🏛️', roleId: '1520680069415174275', roleId2: '1398201167154122752' },
   'trainee': { name: 'Trainee (Стажёр)', webhook: process.env.WEBHOOK_REPORT_TRAINEE, emoji: '📖', roleId: '1385530645186613311', roleId2: '1520680066445742232' }
@@ -37,7 +37,8 @@ const webhooks = {
   transferToFib: process.env.WEBHOOK_TRANSFER_TO_FIB,
   weaponRequest: process.env.WEBHOOK_WEAPON_REQUEST,
   leave: process.env.WEBHOOK_LEAVE,
-  withdrawal: process.env.WEBHOOK_WITHDRAWAL
+  withdrawal: process.env.WEBHOOK_WITHDRAWAL,
+  hiring: process.env.WEBHOOK_HIRING // <--- Добавлено!
 };
 
 async function sendToDiscord(webhookUrl, data, retries = 3) {
@@ -96,10 +97,22 @@ export default async function handler(req, res) {
   let webhookUrl;
   let roleMentions = '';
 
-  // Определяем вебхук и роли для пинга
-  if (type === 'withdrawal' || type === 'reinstatement' || type === 'transferToFib') {
-    webhookUrl = webhooks[type];
-    if (!webhookUrl) return res.status(500).json({ error: `Вебхук для ${type} не настроен` });
+  // Обработка всех типов форм
+  if (type === 'hiring') { // <--- Добавлено!
+    webhookUrl = webhooks.hiring;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для трудоустройства не настроен' });
+    roleMentions = '<@&1274110499377778755>'; // Роль Deputy of Director (замени на нужную, если отличается)
+  } else if (type === 'withdrawal') {
+    webhookUrl = webhooks.withdrawal;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для снятия ЧС не настроен' });
+    roleMentions = '<@&1274110499377778755> <@&1274110499377778756>';
+  } else if (type === 'reinstatement') {
+    webhookUrl = webhooks.reinstatement;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для восстановления не настроен' });
+    roleMentions = '<@&1274110499377778755> <@&1274110499377778756>';
+  } else if (type === 'transferToFib') {
+    webhookUrl = webhooks.transferToFib;
+    if (!webhookUrl) return res.status(500).json({ error: 'Вебхук для перевода в FIB не настроен' });
     roleMentions = '<@&1274110499377778755> <@&1274110499377778756>';
   } else if (type === 'weaponRequest') {
     webhookUrl = webhooks.weaponRequest;
@@ -144,21 +157,13 @@ export default async function handler(req, res) {
   const embed = {
     title: getFormTitle(type, department, targetDepartment),
     color: getFormColor(type),
-    author: {
-      name: username,
-      icon_url: `https://cdn.discordapp.com/avatars/${userId}/${user.avatar}.png`
-    },
+    author: { name: username, icon_url: `https://cdn.discordapp.com/avatars/${userId}/${user.avatar}.png` },
     fields: buildFields(type, department, targetDepartment, formData, userId, username),
     footer: { text: 'Majestic FIB Forms • ' + new Date().toLocaleDateString('ru-RU') },
     timestamp: new Date().toISOString()
   };
 
-  const result = await sendToDiscord(webhookUrl, {
-    content: roleMentions.trim() || undefined,
-    embeds: [embed],
-    username: 'Majestic FIB Forms',
-    avatar_url: 'https://i.imgur.com/AfFp7pu.png'
-  });
+  const result = await sendToDiscord(webhookUrl, { content: roleMentions.trim() || undefined, embeds: [embed], username: 'Majestic FIB Forms', avatar_url: 'https://i.imgur.com/AfFp7pu.png' });
 
   if (result.success) {
     res.status(200).json({ success: true });
@@ -168,6 +173,7 @@ export default async function handler(req, res) {
 }
 
 function getFormTitle(type, department, targetDepartment) {
+  if (type === 'hiring') return '📝 Трудоустройство в FIB'; // <--- Добавлено!
   if (type === 'withdrawal') return '🚫 Снятие ЧС';
   if (type === 'reinstatement') return '🔁 Восстановление';
   if (type === 'transferToFib') return '🏛️ Перевод в FIB';
@@ -182,9 +188,17 @@ function getFormTitle(type, department, targetDepartment) {
 
 function getFormColor(type) {
   const colors = {
-    'withdrawal': 0xFF69B4, 'reinstatement': 0x00FFFF, 'transferToFib': 0x00BFFF, 'weaponRequest': 0xFF0000,
-    'leave': 0x00FF00, 'promotion': 0x4CAF50, 'transfer': 0x2196F3, 'report': 0xFF9800,
-    'highrank': 0xFF69B4, 'resignation': 0xDC3545
+    'hiring': 0x2ECC71, // <--- Добавлено! Зеленый как на скриншоте
+    'withdrawal': 0xFF69B4,
+    'reinstatement': 0x00FFFF,
+    'transferToFib': 0x00BFFF,
+    'weaponRequest': 0xFF0000,
+    'leave': 0x00FF00,
+    'promotion': 0x4CAF50,
+    'transfer': 0x2196F3,
+    'report': 0xFF9800,
+    'highrank': 0xFF69B4,
+    'resignation': 0xDC3545
   };
   return colors[type] || 0x5865F2;
 }
@@ -195,22 +209,97 @@ function buildFields(type, department, targetDepartment, data, userId, username)
     { name: '🆔 Discord ID', value: userId, inline: true }
   ];
 
-  // ОТЧЁТ О ПОВЫШЕНИИ (КРАСИВЫЕ ПОЛЯ)
-  if (type === 'report') {
-    const dept = DEPARTMENTS[department];
-    const instructorText = data.isInstructor === 'yes' ? '✅ Да' : '❌ Нет';
+  // НОВАЯ ФОРМА ТРУДОУСТРОЙСТВА
+  if (type === 'hiring') {
     return [
       { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
-      { name: '🏢 Отдел', value: dept ? `${dept.emoji} ${dept.name}` : 'Не указан', inline: false },
-      { name: '📌 Текущий ранг', value: data.currentRank || 'Не указан', inline: false },
-      { name: '🎯 Целевой ранг', value: data.targetRank || 'Не указан', inline: false },
-      { name: '👨‍🏫 Назначен на инструктора', value: instructorText, inline: false },
-      { name: '🔗 Ссылки на работу', value: data.workLinks || 'Не указаны', inline: false },
+      { name: '🎂 Возраст (RP)', value: data.age || 'Не указан', inline: false },
+      { name: '💼 Опыт работы', value: data.experience || 'Не указан', inline: false },
+      { name: '📚 Знание законов RP', value: data.lawKnowledge || 'Не указано', inline: false },
+      { name: '📄 Скриншот паспорта', value: data.passportScreenshot || 'Не указано', inline: false },
+      { name: '🎖️ Военный билет', value: data.militaryId || 'Не указано', inline: false },
+      { name: '🩺 Мед. справки', value: data.medicalCertificates || 'Не указано', inline: false },
       ...baseFields
     ];
   }
 
-  // ПЕРЕВОД В ОТДЕЛ (КРАСИВЫЕ ПОЛЯ)
+  // ОСТАЛЬНЫЕ ФОРМЫ
+  if (type === 'withdrawal') {
+    return [
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '🚨 Причина ЧС', value: data.reason || 'Не указана', inline: false },
+      { name: '📅 Дата выдачи ЧС', value: data.date || 'Не указана', inline: false },
+      ...baseFields
+    ];
+  }
+
+  if (type === 'weaponRequest') {
+    return [
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '📌 Ваш ранг', value: data.rank || 'Не указан', inline: false },
+      { name: '🏢 Ваш отдел', value: data.department || 'Не указан', inline: false },
+      { name: '🔫 Предмет на выбор', value: data.item || 'Не указан', inline: false },
+      ...baseFields
+    ];
+  }
+
+  if (type === 'reinstatement') {
+    return [
+      { name: '👤 Имя Фамилия | Статик ID', value: data.fullName || 'Не указано', inline: false },
+      { name: '📌 Ранг на момент увольнения', value: data.rank || 'Не указан', inline: false },
+      { name: '📸 Доказательства', value: data.proof || 'Не указано', inline: false },
+      { name: '⚠️ Уволен после Ban/Warn?', value: data.wasBannedWarned || 'Не указано', inline: false },
+      ...(data.wasBannedWarned === 'yes' ? [{ name: '🔗 Одобрение', value: data.approvalLink || 'Не указано', inline: false }] : []),
+      ...baseFields
+    ];
+  }
+
+  if (type === 'transferToFib') {
+    return [
+      { name: '👤 Имя Фамилия | Статик ID', value: data.fullName || 'Не указано', inline: false },
+      { name: '✅ Одобрение', value: data.approval || 'Не указано', inline: false },
+      { name: '📸 Доказательство ранга', value: data.rankProof || 'Не указано', inline: false },
+      ...baseFields
+    ];
+  }
+
+  if (type === 'leave') {
+    return [
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '🏢 Отдел', value: data.department || 'Не указан', inline: false },
+      { name: '📝 Причина', value: data.reason || 'Не указана', inline: false },
+      { name: '📅 Начало', value: data.startDate || 'Не указано', inline: false },
+      { name: '📅 Конец', value: data.endDate || 'Не указано', inline: false },
+      ...baseFields
+    ];
+  }
+
+  if (type === 'promotion') {
+    return [
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '📊 Диапазон рангов', value: data.rankRange || 'Не указано', inline: false },
+      { name: '🔗 Ссылка на отчет', value: data.reportLink || 'Не указано', inline: false },
+      ...baseFields
+    ];
+  }
+
+  if (type === 'highrank') {
+    return [
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '📊 Диапазон рангов', value: data.rankRange || 'Не указано', inline: false },
+      { name: '🔗 Ссылка на работу', value: data.workLink || 'Не указано', inline: false },
+      ...baseFields
+    ];
+  }
+
+  if (type === 'resignation') {
+    return [
+      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
+      { name: '📸 Скриншот планшета', value: data.screenshot || 'Не указано', inline: false },
+      ...baseFields
+    ];
+  }
+
   if (type === 'transfer') {
     const fields = [
       { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
@@ -240,86 +329,6 @@ function buildFields(type, department, targetDepartment, data, userId, username)
 
     fields.push(...baseFields);
     return fields;
-  }
-
-  // ===== ИСПРАВЛЕННЫЕ weaponRequest и leave с использованием department =====
-  if (type === 'weaponRequest') {
-    return [
-      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
-      { name: '📌 Ваш ранг', value: data.rank || 'Не указан', inline: false },
-      // ✅ Теперь используем department из запроса
-      { name: '🏢 Ваш отдел', value: department || 'Не указан', inline: false },
-      { name: '🔫 Предмет на выбор', value: data.item || 'Не указан', inline: false },
-      ...baseFields
-    ];
-  }
-
-  if (type === 'leave') {
-    return [
-      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
-      // ✅ Теперь используем department из запроса
-      { name: '🏢 Отдел', value: department || 'Не указан', inline: false },
-      { name: '📝 Причина', value: data.reason || 'Не указана', inline: false },
-      { name: '📅 Начало', value: data.startDate || 'Не указано', inline: false },
-      { name: '📅 Конец', value: data.endDate || 'Не указано', inline: false },
-      ...baseFields
-    ];
-  }
-
-  // ОСТАЛЬНЫЕ ФОРМЫ
-  if (type === 'withdrawal') {
-    return [
-      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
-      { name: '🚨 Причина ЧС', value: data.reason || 'Не указана', inline: false },
-      { name: '📅 Дата выдачи ЧС', value: data.date || 'Не указана', inline: false },
-      ...baseFields
-    ];
-  }
-
-  if (type === 'reinstatement') {
-    return [
-      { name: '👤 Имя Фамилия | Статик ID', value: data.fullName || 'Не указано', inline: false },
-      { name: '📌 Ранг на момент увольнения', value: data.rank || 'Не указан', inline: false },
-      { name: '📸 Доказательства', value: data.proof || 'Не указано', inline: false },
-      { name: '⚠️ Уволен после Ban/Warn?', value: data.wasBannedWarned || 'Не указано', inline: false },
-      ...(data.wasBannedWarned === 'yes' ? [{ name: '🔗 Одобрение', value: data.approvalLink || 'Не указано', inline: false }] : []),
-      ...baseFields
-    ];
-  }
-
-  if (type === 'transferToFib') {
-    return [
-      { name: '👤 Имя Фамилия | Статик ID', value: data.fullName || 'Не указано', inline: false },
-      { name: '✅ Одобрение', value: data.approval || 'Не указано', inline: false },
-      { name: '📸 Доказательство ранга', value: data.rankProof || 'Не указано', inline: false },
-      ...baseFields
-    ];
-  }
-
-  if (type === 'promotion') {
-    return [
-      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
-      { name: '📊 Диапазон рангов', value: data.rankRange || 'Не указано', inline: false },
-      { name: '🔗 Ссылка на отчет', value: data.reportLink || 'Не указано', inline: false },
-      ...baseFields
-    ];
-  }
-
-  if (type === 'highrank') {
-    return [
-      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
-      { name: '📊 Диапазон рангов', value: data.rankRange || 'Не указано', inline: false },
-      { name: '🔗 Ссылка на работу', value: data.workLink || 'Не указано', inline: false },
-      ...baseFields
-    ];
-  }
-
-  if (type === 'resignation') {
-    return [
-      { name: '👤 Имя Фамилия + Статик', value: data.fullName || 'Не указано', inline: false },
-      { name: '📸 Скриншот планшета', value: data.screenshot || 'Не указано', inline: false },
-      ...baseFields
-    ];
   }
 
   return [...baseFields, ...Object.entries(data).map(([key, value]) => ({ name: key, value: String(value) || 'Не указано', inline: false }))];
