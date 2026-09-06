@@ -24,6 +24,7 @@ export default function Layout({ children }) {
 
   const tabs = [
     { name: 'Формы', path: '/dashboard', icon: '📝' },
+    { name: 'Участники', path: '/members', icon: '👥' },  // Новая вкладка
     { name: 'Профиль', path: '/profile', icon: '👤' },
     { name: 'Справка', path: '/help', icon: '📖' },
     ...(isAdmin ? [{ name: 'Админ', path: '/admin', icon: '🛠️' }] : []),
@@ -31,9 +32,7 @@ export default function Layout({ children }) {
 
   return (
     <div className="app-container">
-      {/* Фон с линиями для остальных страниц */}
       <ParticleBackground />
-
       <nav className="navbar">
         <div className="nav-logo">
           <img src="/logo.png" alt="FIB Logo" className="nav-logo-img" />
@@ -76,7 +75,6 @@ export default function Layout({ children }) {
           position: relative;
         }
 
-        /* Фон должен быть позади контента */
         .app-container > :global(.p5Canvas) {
           position: fixed !important;
           top: 0;
