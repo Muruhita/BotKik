@@ -8,19 +8,6 @@ export default function Layout({ children }) {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isLight, setIsLight] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved === 'light') setIsLight(true);
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = !isLight ? 'light' : 'dark';
-    setIsLight(!isLight);
-    localStorage.setItem('theme', newTheme);
-    document.documentElement.classList.toggle('light', !isLight);
-  };
 
   useEffect(() => {
     fetch('/api/me')
@@ -44,7 +31,9 @@ export default function Layout({ children }) {
 
   return (
     <div className="app-container">
+      {/* Фон с линиями для остальных страниц */}
       <ParticleBackground />
+
       <nav className="navbar">
         <div className="nav-logo">
           <img src="/logo.png" alt="FIB Logo" className="nav-logo-img" />
@@ -63,9 +52,6 @@ export default function Layout({ children }) {
         </div>
         <div className="nav-user">
           {user && <span>{user.username}</span>}
-          <button className="theme-toggle" onClick={toggleTheme}>
-            {isLight ? '🌙' : '☀️'}
-          </button>
           <button onClick={async () => { await fetch('/api/logout', { method: 'POST' }); router.push('/'); }}>Выйти</button>
         </div>
       </nav>
@@ -75,9 +61,9 @@ export default function Layout({ children }) {
       </main>
 
       <footer className="footer">
-        <a href="/terms" className="footer-link">Условия</a>
+        <a href="/terms" className="footer-link">Мини-игра</a>
         <span className="footer-sep">•</span>
-        <a href="/privacy" className="footer-link">Справка</a>
+        <a href="/privacy" className="footer-link">Полезные ссылки</a>
         <span className="footer-sep">•</span>
         <span className="footer-author">Автор: @muruh1ta</span>
       </footer>
@@ -85,11 +71,12 @@ export default function Layout({ children }) {
       <style jsx>{`
         .app-container {
           min-height: 100vh;
-          background: var(--bg);
-          color: var(--text);
+          background: #0a0a0a;
+          color: white;
           position: relative;
         }
 
+        /* Фон должен быть позади контента */
         .app-container > :global(.p5Canvas) {
           position: fixed !important;
           top: 0;
@@ -104,8 +91,9 @@ export default function Layout({ children }) {
           align-items: center;
           justify-content: space-between;
           padding: 15px 30px;
-          background: var(--bg-secondary);
-          border-bottom: 1px solid var(--border);
+          background: rgba(26, 26, 26, 0.8);
+          backdrop-filter: blur(15px);
+          border-bottom: 1px solid #333;
         }
         .nav-logo {
           display: flex;
@@ -113,7 +101,7 @@ export default function Layout({ children }) {
           gap: 10px;
           font-size: 20px;
           font-weight: bold;
-          color: var(--text);
+          color: #fff;
         }
         .nav-logo-img {
           width: 28px;
@@ -127,7 +115,7 @@ export default function Layout({ children }) {
         .nav-tab {
           background: transparent;
           border: none;
-          color: var(--text-secondary);
+          color: #aaa;
           padding: 8px 15px;
           border-radius: 8px;
           cursor: pointer;
@@ -135,12 +123,13 @@ export default function Layout({ children }) {
           font-size: 14px;
         }
         .nav-tab:hover {
-          color: var(--text);
-          background: var(--bg-tertiary);
+          color: #fff;
+          background: #333;
         }
         .nav-tab.active {
-          color: var(--button-text);
-          background: var(--button-bg);
+          color: #fff;
+          background: #fff;
+          color: #000;
           font-weight: bold;
         }
         .nav-user {
@@ -149,19 +138,14 @@ export default function Layout({ children }) {
           gap: 15px;
         }
         .nav-user button {
-          background: var(--bg-tertiary);
-          color: var(--text);
-          border: 1px solid var(--border);
+          background: #444;
+          color: white;
+          border: none;
           padding: 6px 12px;
           border-radius: 6px;
           cursor: pointer;
         }
-        .nav-user .theme-toggle {
-          background: transparent;
-          border: none;
-          font-size: 20px;
-          padding: 4px;
-        }
+
         .main-content {
           position: relative;
           z-index: 10;
@@ -184,28 +168,29 @@ export default function Layout({ children }) {
           align-items: center;
           gap: 8px;
           padding: 15px 20px;
-          background: var(--bg-secondary);
-          border-top: 1px solid var(--border);
+          background: rgba(255, 255, 255, 0.02);
+          border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
         .footer-link {
           background: transparent;
-          border: 1px solid var(--border);
+          border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 6px;
           padding: 4px 10px;
-          color: var(--text-secondary);
+          color: #aaa;
           text-decoration: none;
           transition: all 0.2s;
           font-size: 12px;
         }
         .footer-link:hover {
-          background: var(--bg-tertiary);
-          color: var(--text);
+          background: rgba(255, 255, 255, 0.1);
+          color: #fff;
+          border-color: rgba(255, 255, 255, 0.3);
         }
         .footer-sep {
-          color: var(--text-secondary);
+          color: #555;
         }
         .footer-author {
-          color: var(--text-secondary);
+          color: #888;
           font-size: 12px;
         }
       `}</style>
