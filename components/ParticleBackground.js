@@ -52,7 +52,7 @@ export default function ParticleBackground() {
             this.y = p.random(p.height);
             this.vx = p.random(-1, 1);
             this.vy = p.random(-1, 1);
-            this.color = p.color(p.random(30, 80), p.random(100, 160), p.random(200, 255), 80);
+            this.color = p.color(p.random(30, 80), p.random(100, 160), p.random(200, 255), 50);
           }
 
           update() {
