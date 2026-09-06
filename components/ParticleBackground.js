@@ -19,7 +19,7 @@ export default function ParticleBackground() {
     function initSketch() {
       const sketch = (p) => {
         let particles = [];
-        let parNum = 800; // Уменьшено для производительности
+        let parNum = 100; // Уменьшено для производительности
         let noiseScale = 0.005;
         let speed = 1.5;
 
@@ -52,7 +52,7 @@ export default function ParticleBackground() {
             this.y = p.random(p.height);
             this.vx = p.random(-1, 1);
             this.vy = p.random(-1, 1);
-            this.color = p.color(p.random(30, 80), p.random(100, 160), p.random(200, 255), 20);
+            this.color = p.color(p.random(30, 80), p.random(100, 160), p.random(200, 255), 35);
           }
 
           update() {
