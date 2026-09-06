@@ -43,7 +43,7 @@ export default function Help() {
   return (
     <Layout>
       <div className="help-container">
-        <h1>📖 Справка</h1>
+        <h1>Справка</h1>
 
         <div className="content-box">
           {editMode ? (
@@ -71,7 +71,7 @@ export default function Help() {
               </div>
               {isAdmin && (
                 <button className="edit-btn" onClick={() => setEditMode(true)}>
-                  ✏️ Редактировать
+                   Редактировать
                 </button>
               )}
             </div>
