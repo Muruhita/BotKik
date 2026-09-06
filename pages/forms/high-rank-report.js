@@ -63,7 +63,7 @@ export default function HighRankReportForm() {
       <div className="form-page">
         <button onClick={() => router.push('/dashboard')} className="back-btn">← Назад к выбору</button>
         <div className="form-container">
-          <h1>🌟 Отчёт на повышение (Хай Ранги)</h1>
+          <h1>⚜️ Отчёт на повышение (Хай Ранги)</h1>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Имя Фамилия + Статик *</label>
