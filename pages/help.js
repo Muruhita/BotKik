@@ -10,12 +10,18 @@ export default function Help() {
   const [newContent, setNewContent] = useState('');
 
   useEffect(() => {
+    // Загружаем справку
     fetch('/api/help')
       .then(res => res.json())
       .then(data => {
         setContent(data.content || 'Информация пока не заполнена.');
         setNewContent(data.content || '');
+      })
+      .catch(() => {
+        setContent('Не удалось загрузить справку.');
       });
+
+    // Проверяем права администратора
     fetch('/api/me')
       .then(res => res.json())
       .then(data => {
@@ -36,56 +42,186 @@ export default function Help() {
     }
   };
 
+  // Рендер текста с сохранением переносов строк
+  const renderContent = (text) => {
+    // Разбиваем по строкам и оборачиваем в параграфы с стилем white-space: pre-line
+    // Но проще использовать style white-space: pre-line у контейнера
+    return (
+      <div className="content-text">
+        {text}
+      </div>
+    );
+  };
+
   return (
     <Layout>
       <div className="help-container">
         <h1>📖 Справка</h1>
+
         <div className="content-box">
           {editMode ? (
             <>
-              <textarea value={newContent} onChange={(e) => setNewContent(e.target.value)} rows="10" />
-              <button onClick={saveContent}>Сохранить</button>
+              <div className="edit-header">
+                <span>Режим редактирования (Shift+Enter — новый абзац)</span>
+              </div>
+              <textarea
+                value={newContent}
+                onChange={(e) => setNewContent(e.target.value)}
+                rows="12"
+                placeholder="Введите текст справки. Используйте Shift+Enter для переноса строки."
+                className="edit-textarea"
+              />
+              <div className="edit-actions">
+                <button className="save-btn" onClick={saveContent}>💾 Сохранить</button>
+                <button className="cancel-btn" onClick={() => setEditMode(false)}>Отмена</button>
+              </div>
             </>
           ) : (
-            <p>{content}</p>
+            <div className="view-mode">
+              {renderContent(content)}
+              {isAdmin && (
+                <button className="edit-btn" onClick={() => setEditMode(true)}>
+                  ✏️ Редактировать
+                </button>
+              )}
+            </div>
           )}
         </div>
-        {isAdmin && !editMode && (
-          <button onClick={() => setEditMode(true)}>✏️ Редактировать</button>
-        )}
       </div>
 
       <style jsx>{`
         .help-container {
           max-width: 800px;
           margin: 0 auto;
+          padding: 20px;
         }
+        h1 {
+          color: #fff;
+          text-align: center;
+          margin-bottom: 30px;
+          font-size: 36px;
+          text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+          animation: fadeIn 0.5s ease;
+        }
+
         .content-box {
-          background: #161616;
-          border: 1px solid #333;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          border-radius: 16px;
           padding: 30px;
-          border-radius: 15px;
-          margin-bottom: 20px;
+          position: relative;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+          transition: border-color 0.3s ease;
+          animation: slideUp 0.5s ease;
         }
-        textarea {
+
+        .content-box:hover {
+          border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .view-mode {
+          min-height: 150px;
+        }
+
+        .content-text {
+          white-space: pre-line; /* Главное: сохраняем переносы строк */
+          color: #e0e0e0;
+          font-size: 16px;
+          line-height: 1.7;
+          word-break: break-word;
+        }
+
+        .edit-header {
+          color: #aaa;
+          font-size: 13px;
+          margin-bottom: 15px;
+          border-bottom: 1px solid rgba(255,255,255,0.1);
+          padding-bottom: 10px;
+        }
+
+        .edit-textarea {
           width: 100%;
-          background: #222;
-          color: white;
-          border: 1px solid #444;
-          border-radius: 8px;
+          background: rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 10px;
+          color: #fff;
           padding: 15px;
-          box-sizing: border-box;
+          font-size: 16px;
+          line-height: 1.6;
+          resize: vertical;
+          min-height: 200px;
+          outline: none;
+          transition: border-color 0.3s;
         }
-        button {
-          padding: 10px 20px;
-          background: #fff;
-          color: #000;
+
+        .edit-textarea:focus {
+          border-color: #5865F2;
+        }
+
+        .edit-actions {
+          display: flex;
+          gap: 10px;
+          margin-top: 15px;
+        }
+
+        .save-btn {
+          background: #5865F2;
+          color: white;
           border: none;
+          padding: 10px 20px;
           border-radius: 8px;
           cursor: pointer;
+          font-weight: 600;
+          transition: all 0.2s;
         }
-        button:hover {
-          background: #ccc;
+
+        .save-btn:hover {
+          background: #4752C4;
+          transform: translateY(-2px);
+        }
+
+        .cancel-btn {
+          background: rgba(255,255,255,0.1);
+          color: white;
+          border: 1px solid rgba(255,255,255,0.2);
+          padding: 10px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .cancel-btn:hover {
+          background: rgba(255,255,255,0.2);
+        }
+
+        .edit-btn {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.2);
+          color: white;
+          padding: 8px 14px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 14px;
+          transition: all 0.2s;
+        }
+
+        .edit-btn:hover {
+          background: rgba(255,255,255,0.2);
+          border-color: white;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </Layout>
