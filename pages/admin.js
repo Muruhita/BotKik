@@ -3,24 +3,9 @@ import { useState, useEffect } from 'react';
 
 const ADMIN_IDS = ['1018113109346504744', '555380718566506506', '260076815970729985'];
 
-const FORM_NAMES = {
-  promotion: '📈 Запрос на повышение',
-  transfer: '🔄 Перевод в отдел',
-  report: '📋 Отчёт о повышении',
-  highrank: '🌟 Отчёт (Хай Ранги)',
-  resignation: '🚪 Увольнение',
-  reinstatement: '🔁 Восстановление',
-  transferToFib: '🏛️ Перевод в FIB',
-  weaponRequest: '🔫 Спец Вооружение',
-  leave: '🌴 Отпуск',
-  withdrawal: '🚫 Снятие ЧС',
-  hiring: '📝 Трудоустройство'
-};
-
 export default function AdminPanel() {
   const [bannedUsers, setBannedUsers] = useState([]);
   const [formsActive, setFormsActive] = useState(true);
-  const [formStatuses, setFormStatuses] = useState({});
   const [userId, setUserId] = useState('');
   const [status, setStatus] = useState('');
   const [announcement, setAnnouncement] = useState('');
@@ -32,7 +17,6 @@ export default function AdminPanel() {
     const data = await res.json();
     setBannedUsers(data.bannedUsers || []);
     setFormsActive(data.formsActive);
-    setFormStatuses(data.formStatuses || {});
   };
 
   useEffect(() => {
@@ -70,16 +54,6 @@ export default function AdminPanel() {
     const data = await res.json();
     setFormsActive(data.formsActive);
     loadData();
-  };
-
-  const toggleFormType = async (type, currentStatus) => {
-    const res = await fetch('/api/admin/toggle-form-type', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, status: !currentStatus })
-    });
-    const data = await res.json();
-    setFormStatuses(prev => ({ ...prev, [type]: data.status }));
   };
 
   const saveAnnouncement = async () => {
@@ -129,7 +103,7 @@ export default function AdminPanel() {
           {announcementMsg && <p className="announcement-msg">{announcementMsg}</p>}
         </div>
 
-        {/* Остальные секции */}
+        {/* Глобальное управление заявками */}
         <div className="section">
           <h2>Глобальное управление заявками</h2>
           <button onClick={toggleForms} className={formsActive ? 'stop-btn' : 'start-btn'}>
@@ -140,23 +114,7 @@ export default function AdminPanel() {
           </p>
         </div>
 
-        <div className="section">
-          <h2>⚙️ Управление отдельными формами</h2>
-          <div className="forms-list">
-            {Object.entries(FORM_NAMES).map(([type, name]) => (
-              <div key={type} className="form-item">
-                <span className="form-name">{name}</span>
-                <button
-                  className={formStatuses[type] === false ? 'form-off' : 'form-on'}
-                  onClick={() => toggleFormType(type, formStatuses[type] !== false)}
-                >
-                  {formStatuses[type] === false ? '🔴 Выключена' : '🟢 Включена'}
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
+        {/* Разблокировать пользователя */}
         <div className="section">
           <h2>Разблокировать пользователя</h2>
           <input type="text" value={userId} onChange={(e) => setUserId(e.target.value)} placeholder="Discord ID" />
@@ -164,6 +122,7 @@ export default function AdminPanel() {
           {status && <p className="status-msg">{status}</p>}
         </div>
 
+        {/* Список заблокированных */}
         <div className="section">
           <h2>Список заблокированных</h2>
           <div className="banned-list">
@@ -236,45 +195,6 @@ export default function AdminPanel() {
         .announcement-msg {
           margin-top: 10px;
           color: #4CAF50;
-        }
-
-        .forms-list {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-        }
-        .form-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          background: rgba(255,255,255,0.05);
-          padding: 10px 15px;
-          border-radius: 8px;
-        }
-        .form-name {
-          color: #ccc;
-          font-size: 15px;
-        }
-        .form-on, .form-off {
-          padding: 8px 15px;
-          border-radius: 6px;
-          border: none;
-          cursor: pointer;
-          font-weight: bold;
-          color: #fff;
-          transition: all 0.2s;
-        }
-        .form-on {
-          background: #4CAF50;
-        }
-        .form-on:hover {
-          background: #45a049;
-        }
-        .form-off {
-          background: #f44336;
-        }
-        .form-off:hover {
-          background: #da190b;
         }
 
         input {
