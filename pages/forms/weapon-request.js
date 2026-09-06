@@ -47,7 +47,7 @@ export default function WeaponRequestForm() {
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Имя Фамилия + Статик</label>
-              <input type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} required placeholder="Например: Sanya Suspect 270726" />
+              <input type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} required placeholder="Например: Name Surname 123456" />
             </div>
             <div className="form-group">
               <label>Ваш ранг</label>
