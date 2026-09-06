@@ -9,11 +9,11 @@ export default function Dashboard() {
     { title: 'Перевод в отдел', icon: '🔀', path: '/forms/transfer', desc: 'Перевод в другую организацию' },
     { title: 'Отчёт на повышение', icon: '📋', path: '/forms/report', desc: 'Отчёт на повышение своего для отдела' },
     { title: 'Отчёт на повышение (Хай Ранги)', icon: '⚜️', path: '/forms/high-rank-report', desc: 'Запросы повышения от Dep.Head и Выше.' },
-    { title: 'Рапорт на увольнение', icon: '⛔', path: '/forms/resignation', desc: 'Покинуть FIB' },
+    { title: 'Рапорт на увольнение', icon: '📛', path: '/forms/resignation', desc: 'Покинуть FIB' },
     { title: 'Восстановление', icon: '🔁', path: '/forms/reinstatement', desc: 'Восстановиться в FIB' },
     { title: 'Перевод в FIB', icon: '🏛️', path: '/forms/transfer-to-fib', desc: 'Перевестись в FIB' },
     { title: 'Спец Вооружение', icon: '🔫', path: '/forms/weapon-request', desc: 'Запросить спец. оружие' },
-    { title: 'Снятие ЧС', icon: '🛄', path: '/forms/withdrawal', desc: 'Запрос Снять ЧС' },
+    { title: 'Снятие ЧС', icon: '🔑', path: '/forms/withdrawal', desc: 'Запрос Снять ЧС' },
   ];
 
   return (
