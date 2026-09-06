@@ -6,16 +6,16 @@ import redis from '../../lib/redis'; // <--- Добавлено!
 
 const DEPARTMENTS = {
   'ib': { name: 'IB (Intelligence Branch)', webhook: process.env.WEBHOOK_REPORT_IB, emoji: '🕵️', roleId: '1398200840900055071', roleId2: '1520504887497064639' },
-  'cid': { name: 'CID (Criminal Investigation)', webhook: process.env.WEBHOOK_REPORT_CID, emoji: '🔍', roleId: '1398200760843374652', roleId2: '1520680049655676948' },
+  'cid': { name: 'CID (Criminal Investigation Department)', webhook: process.env.WEBHOOK_REPORT_CID, emoji: '🔍', roleId: '1398200760843374652', roleId2: '1520680049655676948' },
   'fa': { name: 'FA (Free Agent)', webhook: process.env.WEBHOOK_REPORT_FA, emoji: '🆓', roleId: '1398200891353468928', roleId2: '1520680052176715876' },
-  'hrt': { name: 'HRT (Hostage Rescue)', webhook: process.env.WEBHOOK_REPORT_HRT, emoji: '🛡️', roleId: '1398201557635567636', roleId2: '1520680047038435358' },
-  'atf': { name: 'ATF (Anti Terrorism)', webhook: process.env.WEBHOOK_REPORT_ATF, emoji: '💥', roleId: '1520680054731051159', roleId2: '1398201048598057041' },
+  'hrt': { name: 'HRT (Hostage Rescue Team)', webhook: process.env.WEBHOOK_REPORT_HRT, emoji: '🛡️', roleId: '1398201557635567636', roleId2: '1520680047038435358' },
+  'atf': { name: 'ATF (Anti Terrorism Force)', webhook: process.env.WEBHOOK_REPORT_ATF, emoji: '🏹', roleId: '1520680054731051159', roleId2: '1398201048598057041' },
   'af': { name: 'AF (Air Force)', webhook: process.env.WEBHOOK_REPORT_AF, emoji: '✈️', roleId: '1398200952602755103', roleId2: '1532529633088635041' },
-  'ocu': { name: 'OCU (Organized Crime)', webhook: process.env.WEBHOOK_REPORT_OCU, emoji: '⚖️', roleId: '1520680060808331294', roleId2: '1418771091291115631' },
-  'dea': { name: 'DEA (Drug Enforcement)', webhook: process.env.WEBHOOK_REPORT_DEA, emoji: '💊', roleId: '1398201115379761283', roleId2: '1274110499356934209' },
-  'fna': { name: 'FNA (Academy)', webhook: process.env.WEBHOOK_REPORT_FNA, emoji: '📚', roleId: '1520680066445742232', roleId2: '1385530645186613311' },
-  'nsb': { name: 'NSB (National Security)', webhook: process.env.WEBHOOK_REPORT_NSB, emoji: '🏛️', roleId: '1520680069415174275', roleId2: '1398201167154122752' },
-  'trainee': { name: 'Trainee (Стажёр)', webhook: process.env.WEBHOOK_REPORT_TRAINEE, emoji: '📖', roleId: '1385530645186613311', roleId2: '1520680066445742232' }
+  'ocu': { name: 'OCU (Organized Crime Unit)', webhook: process.env.WEBHOOK_REPORT_OCU, emoji: '⚖️', roleId: '1520680060808331294', roleId2: '1418771091291115631' },
+  'dea': { name: 'DEA (Drug Enforcement Administration)', webhook: process.env.WEBHOOK_REPORT_DEA, emoji: '🧂', roleId: '1398201115379761283', roleId2: '1274110499356934209' },
+  'fna': { name: 'FNA (Federal National Academy)', webhook: process.env.WEBHOOK_REPORT_FNA, emoji: '📚', roleId: '1520680066445742232', roleId2: '1385530645186613311' },
+  'nsb': { name: 'NSB (National Security Branch)', webhook: process.env.WEBHOOK_REPORT_NSB, emoji: '✴️', roleId: '1520680069415174275', roleId2: '1398201167154122752' },
+  'trainee': { name: 'TR (Trainee)', webhook: process.env.WEBHOOK_REPORT_TRAINEE, emoji: '📝', roleId: '1385530645186613311', roleId2: '1520680066445742232' }
 };
 
 const TRANSFER_WEBHOOKS = {
