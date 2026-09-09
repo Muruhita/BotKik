@@ -23,6 +23,36 @@ export default function App({ Component, pageProps }) {
         input, textarea, button {
           font-family: inherit;
         }
+
+        /* Анимация отправки */
+        .spinner {
+          display: inline-block;
+          width: 18px;
+          height: 18px;
+          border: 2px solid rgba(255,255,255,0.3);
+          border-top-color: #fff;
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+          margin-right: 8px;
+          vertical-align: middle;
+        }
+
+        .success-check {
+          display: inline-block;
+          animation: pop 0.3s ease;
+          font-size: 20px;
+          vertical-align: middle;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        @keyframes pop {
+          0% { transform: scale(0); opacity: 0; }
+          80% { transform: scale(1.2); opacity: 1; }
+          100% { transform: scale(1); opacity: 1; }
+        }
       `}</style>
       <Component {...pageProps} />
     </>
