@@ -22,6 +22,7 @@ export default function TransferForm() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     rank: '',
@@ -86,6 +87,8 @@ export default function TransferForm() {
     }
 
     setSubmitting(true);
+    setSuccess(false);
+
     try {
       const res = await fetch('/api/submit', {
         method: 'POST',
@@ -106,9 +109,10 @@ export default function TransferForm() {
           faPrevious: formData.faPrevious
         })
       });
+
       if (res.ok) {
-        alert('✅ Заявка на перевод успешно отправлена!');
-        router.push('/dashboard');
+        setSuccess(true);
+        setTimeout(() => router.push('/dashboard'), 800); // небольшая пауза, чтобы увидеть галочку
       } else {
         const error = await res.json();
         throw new Error(error.error || 'Ошибка отправки');
@@ -181,8 +185,8 @@ export default function TransferForm() {
               </>
             )}
 
-            <button type="submit" className="submit-btn" disabled={submitting}>
-              {submitting ? '⏳ Отправка...' : '📤 Отправить заявку'}
+            <button type="submit" className="submit-btn" disabled={submitting || success}>
+              {submitting ? <span className="spinner"></span> : success ? <span className="success-check">✅</span> : '📤 Отправить заявку'}
             </button>
           </form>
         </div>
@@ -201,7 +205,8 @@ export default function TransferForm() {
         select option { background: #1a1a1a; }
         .warning { background: rgba(255, 0, 0, 0.1); border: 1px solid #ff4444; color: #ff8080; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
         .submit-btn { width: 100%; padding: 15px; background: #fff; color: #000; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; transition: all 0.3s; }
-        .submit-btn:hover { background: #ccc; transform: translateY(-2px); }
+        .submit-btn:hover:not(:disabled) { background: #ccc; transform: translateY(-2px); }
+        .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
         .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #0a0a0a; }
         .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
