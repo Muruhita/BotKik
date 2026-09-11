@@ -6,12 +6,12 @@ export default function ClaimForm() {
   const router = useRouter();
   const [myNickname, setMyNickname] = useState('');
   const [formData, setFormData] = useState({
-    offenderName: '',   // Имя нарушителя
-    proofLink: '',      // Доказательства
-    reason: ''          // Причина
+    offenderName: '',
+    proofLink: '',
+    reason: ''
   });
 
-  // Автозаполнение вашего ника из профиля
+  // Автоподстановка ника из профиля (но поле остаётся редактируемым)
   useEffect(() => {
     fetch('/api/profile')
       .then(res => res.json())
@@ -48,7 +48,13 @@ export default function ClaimForm() {
             
             <div className="form-group">
               <label>Ваши Имя Фамилия + Статик</label>
-              <input type="text" value={myNickname} readOnly className="readonly-input" placeholder="Автоматически" />
+              <input 
+                type="text" 
+                value={myNickname} 
+                onChange={(e) => setMyNickname(e.target.value)} 
+                required
+                placeholder="Введите ваше Имя Фамилия + Статик"
+              />
             </div>
 
             <div className="form-group">
@@ -98,7 +104,6 @@ export default function ClaimForm() {
         .form-group { margin-bottom: 20px; }
         label { display: block; color: #888; margin-bottom: 8px; }
         input, textarea { width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); color: white; border-radius: 8px; box-sizing: border-box; }
-        .readonly-input { opacity: 0.5; cursor: not-allowed; }
         textarea { resize: vertical; }
         .submit-btn { width: 100%; padding: 15px; background: #fff; color: #000; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; transition: all 0.3s; }
         .submit-btn:hover { background: #ccc; transform: translateY(-2px); }
