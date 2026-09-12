@@ -1,6 +1,6 @@
 {
-  "name": "majestic-fib-forms",
-  "version": "0.1.0",
+  "name": "fib-formsmur",
+  "version": "7.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
